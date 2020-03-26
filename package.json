@@ -4,7 +4,7 @@
   "description": "A distributed pubsub messaging protocol built on Hypercore",
   "main": "lib/index.js",
   "scripts": {
-    "test": "ava",
+    "test": "rm -rf ./test/scratch && ava",
     "lint": "eslint ."
   },
   "author": "Willem Olding <@wollum>",
