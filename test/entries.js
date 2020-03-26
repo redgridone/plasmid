@@ -7,7 +7,9 @@ test('Can create a valid entry', t => {
     author,
     sequence: 0,
     timestamp: 0,
-    type: 'test'
+    content: {
+      type: 'test'
+    }
   })
   t.is(entry.author, author)
 })
