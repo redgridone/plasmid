@@ -14,7 +14,17 @@ function initNode (path) {
 
 function subscribe (node, feedKey, details, options) {
   return new Promise((resolve, reject) => {
-    node.subscribe(feedKey, details, options, () => {
+    node.subscribe(feedKey, details, options)
+    node.on(`subscribed:${feedKey}`, () => {
+      resolve()
+    })
+  })
+}
+
+function unsubscribe (node, feedKey) {
+  return new Promise((resolve, reject) => {
+    node.unsubscribe(feedKey)
+    node.on(`unsubscribed:${feedKey}`, () => {
       resolve()
     })
   })
@@ -32,5 +42,6 @@ function head (node) {
 module.exports = {
   initNode,
   head,
-  subscribe
+  subscribe,
+  unsubscribe
 }
