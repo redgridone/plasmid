@@ -22,5 +22,11 @@
     "hypercore": "^8.11.1",
     "hyperswarm": "^2.9.0",
     "jsonschema": "^1.2.5"
+  },
+  "ava": {
+    "files": [
+      "test/**/*",
+      "!test/test-utils.js"
+    ]
   }
 }
