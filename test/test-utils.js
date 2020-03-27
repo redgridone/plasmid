@@ -1,7 +1,13 @@
 /**
  * Promise based utilities to avoid nested callbacks in tests
  */
+const crypto = require('crypto')
 const Node = require('../lib/node')
+
+function newScratchDir () {
+  const unique = crypto.randomBytes(16).toString('hex')
+  return `./test/scratch/${unique}`
+}
 
 function initNode (path) {
   return new Promise((resolve, reject) => {
@@ -40,6 +46,7 @@ function head (node) {
 }
 
 module.exports = {
+  newScratchDir,
   initNode,
   head,
   subscribe,
