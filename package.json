@@ -19,6 +19,7 @@
     "eslint-plugin-standard": "^4.0.1"
   },
   "dependencies": {
+    "highland": "^2.13.5",
     "hypercore": "^8.11.1",
     "hyperswarm": "^2.9.0",
     "jsonschema": "^1.2.5"
