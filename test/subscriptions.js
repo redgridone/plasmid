@@ -33,3 +33,15 @@ test('Can subscribe then unsubscribe', async t => {
   // this removed the foreign feed
   t.is(n.foreignFeeds[testKey], undefined)
 })
+
+test('Can subscribe, unsubscribe, resubsubscribe many times...', async t => {
+  const n = await initNode(newScratchDir())
+  const nIter = 10
+  for (let i = 0; i < nIter; i++) {
+    await subscribe(n, testKey, {}, {})
+    t.truthy(n.foreignFeeds[testKey])
+    await unsubscribe(n, testKey)
+    t.is(n.foreignFeeds[testKey], undefined)
+  }
+  t.is(n.feed.length, 2 * nIter)
+})
