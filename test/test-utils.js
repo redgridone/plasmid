@@ -12,8 +12,12 @@ function newScratchDir () {
 function initNode (path) {
   return new Promise((resolve, reject) => {
     const n = new Node(path)
-    n.on('ready', () => {
+    n.on('ready', (err) => {
+      if (err) reject(err)
       resolve(n)
+    })
+    n.on('error', (err) => {
+      reject(err)
     })
   })
 }
