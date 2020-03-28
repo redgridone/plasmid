@@ -18,7 +18,9 @@ test('Node will reject an invalid entry', async t => {
   const n = await initNode(newScratchDir())
   t.throws(() => {
     try {
-      n.feed.append({})
+      n.feed.append({
+        sequence: 0
+      })
     } catch (e) {
       throw new Error(e) // need to rethrow as an error (rather than an exception) for ava
     }

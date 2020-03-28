@@ -23,11 +23,11 @@ function initNode (path) {
   })
 }
 
-function subscribe (node, feedKey, details, options) {
+function subscribe (node, sequence, feedKey, details, options) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry({
       author: node.feed.key.toString('hex'),
-      sequence: 0,
+      sequence,
       timestamp: 0,
       content: newSubscribeContent({ feedKey, details, options })
     }))
@@ -37,11 +37,11 @@ function subscribe (node, feedKey, details, options) {
   })
 }
 
-function unsubscribe (node, feedKey) {
+function unsubscribe (node, sequence, feedKey) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry({
       author: node.feed.key.toString('hex'),
-      sequence: 0,
+      sequence,
       timestamp: 0,
       content: newUnsubscribeContent({ feedKey })
     }))
