@@ -3,6 +3,7 @@
  */
 const crypto = require('crypto')
 const Node = require('../lib/node')
+const { newEntry, newSubscribeContent, newUnsubscribeContent } = require('../lib/entries')
 
 function newScratchDir () {
   const unique = crypto.randomBytes(16).toString('hex')
@@ -24,7 +25,12 @@ function initNode (path) {
 
 function subscribe (node, feedKey, details, options) {
   return new Promise((resolve, reject) => {
-    node.subscribe(feedKey, details, options)
+    node.createWriteStream().write(newEntry({
+      author: node.feed.key.toString('hex'),
+      sequence: 0,
+      timestamp: 0,
+      content: newSubscribeContent({ feedKey, details, options })
+    }))
     node.on(`subscribed:${feedKey}`, () => {
       resolve()
     })
@@ -33,7 +39,12 @@ function subscribe (node, feedKey, details, options) {
 
 function unsubscribe (node, feedKey) {
   return new Promise((resolve, reject) => {
-    node.unsubscribe(feedKey)
+    node.createWriteStream().write(newEntry({
+      author: node.feed.key.toString('hex'),
+      sequence: 0,
+      timestamp: 0,
+      content: newUnsubscribeContent({ feedKey })
+    }))
     node.on(`unsubscribed:${feedKey}`, () => {
       resolve()
     })
