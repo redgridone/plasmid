@@ -1,5 +1,6 @@
 const test = require('ava')
-const { newScratchDir, initNode } = require('./test-utils')
+const { newScratchDir } = require('./test-utils')
+const { initNode } = require('../lib/promise')
 
 test('Can construct a node and wait for it to initialize', async t => {
   const n = await initNode(newScratchDir())

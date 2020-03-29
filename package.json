@@ -6,7 +6,7 @@
   "scripts": {
     "test": "rm -rf ./test/scratch && ava",
     "lint": "eslint .",
-    "doc": "jsdoc -d ./docs ./lib"
+    "doc": "jsdoc -c ./.jsdoc.json --verbose"
   },
   "author": "Willem Olding <@wollum>",
   "license": "MIT",
