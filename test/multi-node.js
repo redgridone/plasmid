@@ -1,7 +1,6 @@
 const test = require('ava')
 
-const { newScratchDir } = require('./test-utils')
-const { initNode, subscribe, unsubscribe, head, authorEntry } = require('../lib/promise')
+const { subscribe, authorEntry } = require('../lib/promise')
 const { bootstrapNodes } = require('./multi-node-bootstrapper')
 
 test('A node can subscribe to another using replication streams', async t => {
