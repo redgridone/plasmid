@@ -54,7 +54,7 @@ test('Can subscribe to a feed with an alias and listen for events on this alias,
       resolve(data)
     })
   })
-  await subscribe(alice, 0, bob.feedKey(), {someField: 'passed-to-every-event'}, { alias: 'some-alias' })
+  await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' })
   const bobAuthoredEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
     alice.on(`newData:some-alias`, (data, details) => {
