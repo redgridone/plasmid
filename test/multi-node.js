@@ -59,4 +59,20 @@ test('Can subscribe to a feed with an alias, details are passed to event', async
   t.deepEqual(aliceReceivedEntry, bobAuthoredEntry)
 })
 
-test.todo('Subscribing different feeds to the same alias, only the later one gives events')
+test('Subscribing different feeds to the same alias, only the later one gives events', async t => {
+  const [alice, bob, carol] = await bootstrapNodes(3)
+
+  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' })
+  await subscribe(alice, 1, carol.feedKey(), { }, { alias: 'some-alias' })
+
+  await authorEntry(bob, 0, 'HELLO', { msg: 'hi from bob' }, 100)
+  await authorEntry(carol, 0, 'HELLO', { msg: 'hi from carol' }, 100)
+
+  // should only receive alias event from Carol  
+  await new Promise((resolve, reject) => {
+    alice.on(`newData:some-alias`, (data, details) => {
+      t.is(data.author, carol.feedKey())
+      resolve(data)
+    })
+  })
+})
