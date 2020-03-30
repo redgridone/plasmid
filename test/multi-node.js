@@ -22,3 +22,26 @@ test('A node can subscribe to another using replication streams', async t => {
 	// ensure it is was propagated correctly
 	t.deepEqual(aliceEntry, bobEntry)
 })
+
+test('Bidirectional subscription', async t => {
+	const [alice, bob] = await bootstrapNodes(2)
+	await subscribe(alice, 0, bob.feedKey(), {}, {})
+	await subscribe(bob, 0, alice.feedKey(), {}, {})
+
+	const aliceAuthoredEntry = await authorEntry(alice, 1, 'HELLO', { msg: 'hi from alice' }, 100)
+	const bobAuthoredEntry = await authorEntry(bob, 1, 'HELLO', { msg: 'hi from bob' }, 100)
+	
+	const aliceReceivedEntry = await new Promise((resolve, reject) => {
+		alice.on(`newData:${bob.feedKey()}`, (data) => {
+			resolve(data)
+		})
+	})
+	const bobReceivedEntry = await new Promise((resolve, reject) => {
+		bob.on(`newData:${alice.feedKey()}`, (data) => {
+			resolve(data)
+		})
+	})
+
+	t.deepEqual(aliceAuthoredEntry, bobReceivedEntry)
+	t.deepEqual(bobAuthoredEntry, aliceReceivedEntry)
+})
