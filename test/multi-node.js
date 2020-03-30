@@ -77,7 +77,7 @@ test('Subscribing different feeds to the same alias, only the later one gives ev
   })
 })
 
-test('Unsubscribinig removes registered alias', async t => {
+test('Unsubscribing removes registered alias', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
   await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' })
