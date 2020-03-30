@@ -4,7 +4,7 @@ const { initNode } = require('../lib/promise')
 
 test('Can construct a node and wait for it to initialize', async t => {
   const n = await initNode(newScratchDir())
-  t.is(n.feed.key.toString('hex').length, 64)
+  t.is(n.feedKey().length, 64)
 })
 
 test('Can construct a node, destroy it and reinitialize from same directory', async t => {
