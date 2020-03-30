@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const { subscribe, authorEntry } = require('../lib/promise')
+const { subscribe, unsubscribe, authorEntry } = require('../lib/promise')
 const { bootstrapNodes } = require('./multi-node-bootstrapper')
 
 test('A node can subscribe to another using replication streams', async t => {
@@ -75,4 +75,13 @@ test('Subscribing different feeds to the same alias, only the later one gives ev
       resolve(data)
     })
   })
+})
+
+test('Unsubscribinig removes registered alias', async t => {
+  const [alice, bob] = await bootstrapNodes(2)
+
+  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' })
+  await unsubscribe(alice, 1, bob.feedKey())
+
+  t.is(alice.feedAliases['some-alias'], undefined)
 })
