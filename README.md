@@ -69,6 +69,8 @@ A node can subscribe to the feed of another node to replicate historical data an
 }
 ```
 
+The `alias` option allows registering this subscription with a name other than the feedKey. Events triggered by this foreigin feed will be posted to the alias name as well as the feed key. This is particularly useful for the consuming code and allows for dynamic configuration. For example if the consuming code is listening to events from the 'pricing-provider' alias it is possible to change which foreign feed is subscribed under this alias to change the devices behavious.
+
 The `store` and `replication` options specify how much of the feed should be stored and how much should be made availble to other peers respectively. Full means try to obtain all the data, tail means entries made after the timestamp of this subscribe entry, and none means only take action on events and don't persist. The replication must be >= store. (e.g. you can't store none and replicate the tail). 
 
 ##### %unsubscribe
