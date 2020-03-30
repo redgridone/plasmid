@@ -28,7 +28,8 @@
   "ava": {
     "files": [
       "test/**/*",
-      "!test/test-utils.js"
+      "!test/test-utils.js",
+      "!test/multi-node-bootstrapper.js"
     ]
   }
 }
