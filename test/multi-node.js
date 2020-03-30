@@ -46,14 +46,8 @@ test('Bidirectional subscription', async t => {
   t.deepEqual(bobAuthoredEntry, aliceReceivedEntry)
 })
 
-test('Can subscribe to a feed with an alias and listen for events on this alias, details are passed to event', async t => {
+test('Can subscribe to a feed with an alias, details are passed to event', async t => {
   const [alice, bob] = await bootstrapNodes(2)
-  // set up to listen for alias events
-  const promise = new Promise((resolve, reject) => {
-    alice.on('newData:some-alias', data => {
-      resolve(data)
-    })
-  })
   await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' })
   const bobAuthoredEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
@@ -64,3 +58,5 @@ test('Can subscribe to a feed with an alias and listen for events on this alias,
   })
   t.deepEqual(aliceReceivedEntry, bobAuthoredEntry)
 })
+
+test.todo('Subscribing different feeds to the same alias, only the later one gives events')
