@@ -30,7 +30,7 @@ test('Bidirectional subscription', async t => {
 
   const aliceAuthoredEntry = await authorEntry(alice, 1, 'HELLO', { msg: 'hi from alice' }, 100)
   const bobAuthoredEntry = await authorEntry(bob, 1, 'HELLO', { msg: 'hi from bob' }, 100)
-  
+
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
     alice.on(`newData:${bob.feedKey()}`, (data) => {
       resolve(data)
@@ -51,7 +51,7 @@ test('Can subscribe to a feed with an alias, details are passed to event', async
   await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' })
   const bobAuthoredEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
-    alice.on(`newData:some-alias`, (data, details) => {
+    alice.on('newData:some-alias', (data, details) => {
       t.is(details.someField, 'passed-to-every-event')
       resolve(data)
     })
@@ -68,9 +68,9 @@ test('Subscribing different feeds to the same alias, only the later one gives ev
   await authorEntry(bob, 0, 'HELLO', { msg: 'hi from bob' }, 100)
   await authorEntry(carol, 0, 'HELLO', { msg: 'hi from carol' }, 100)
 
-  // should only receive alias event from Carol  
+  // should only receive alias event from Carol
   await new Promise((resolve, reject) => {
-    alice.on(`newData:some-alias`, (data, details) => {
+    alice.on('newData:some-alias', (data, details) => {
       t.is(data.author, carol.feedKey())
       resolve(data)
     })

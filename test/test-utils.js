@@ -9,5 +9,5 @@ function newScratchDir () {
 }
 
 module.exports = {
-  newScratchDir,
+  newScratchDir
 }
