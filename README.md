@@ -1,6 +1,7 @@
 # Plasmid
 
-PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both SecureScuttlebutt (SSB) and Holochain but takes into account the requirements of lightweight IoT devices. 
+PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both SecureScuttlebutt (SSB) and Holochain but takes into account the requirements of lightweight IoT devices.
+PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both SecureScuttlebutt (SSB), Holochain and the [Internet of Energy Protocol Suite](www.internetof.energy) (IoE) to take into account the requirements of lightweight IoT devices.
 
 [Read the docs here](https://redgridone.github.io/plasmid/)
 
@@ -16,7 +17,6 @@ Hypercore is a protocol for contructing and replicating single-author append-onl
 
 The Merkle tree structure has an added advantage over hash-chain based append only feeds in that it allows partial replication with data integrity. This is important for edge devices which cannot store the large quantites of data required to effectively participate. The only requirement is that an author must have access to the entirety of their feed history in order to compute the root hash (although they do not have to store it themselves).
 
-A non-author wishing to verify part of the feed must request a subset of the tree hashes signed by the author. This allows them to verify ordering and authorship on a partial chunk. This is similar to how file chunks are verified in BitTorrent. 
 
 A messaging protocol allows peers to request subsets of the feed from the author or from each other. It also allows peers to notify each other of new messages as they are created so they can be propagated in close to real time.
 
@@ -25,7 +25,7 @@ A messaging protocol allows peers to request subsets of the feed from the author
 This is the peer-to-peer networking and discovery layer. Without going into too much detail it allows the discovery of peers via a number of different methods (both distributed and centralised) and connects them over a socket connection. Peers advertise the topic they have and different topics they are interested in to connect with other peers.
 
 In this protocol (similar to DAT) the topic is the public key of the feed.
-    
+
 ## Added Functionality
 
 Using the above as the fundamental building blocks, Plasmid adds PubSub style messaging and the ability to delegate authorship to another node. The feed represents the source of truth in every case allowing a device state to be reconstructed by another at any point in time.
@@ -69,9 +69,9 @@ A node can subscribe to the feed of another node to replicate historical data an
 }
 ```
 
-The `alias` option allows registering this subscription with a name other than the feedKey. Events triggered by this foreign feed will be posted to the alias name as well as the feed key. This is particularly useful for the consuming code and allows for dynamic configuration. For example if the consuming code is listening to events from the 'pricing-provider' alias it is possible to change which foreign feed is subscribed under this alias to change the devices behavious.
+The `alias` option allows registering this subscription with a name other than the feedKey. Events triggered by this foreign feed will be posted to the alias name as well as the feed key. This is particularly useful for the consuming code and allows for dynamic configuration. For example if the consuming code is listening to events from the 'pricing-provider' alias it is possible to change which foreign feed is subscribed under this alias to change the devices behaviour.
 
-The `store` and `replication` options specify how much of the feed should be stored and how much should be made availble to other peers respectively. Full means try to obtain all the data, tail means entries made after the timestamp of this subscribe entry, and none means only take action on events and don't persist. The replication must be >= store. (e.g. you can't store none and replicate the tail). 
+The `store` and `replication` options specify how much of the feed should be stored and how much should be made available to other peers respectively. Full means try to obtain all the data, tail means entries made after the timestamp of this subscribe entry, and none means only take action on events and don't persist. The replication must be >= store. (e.g. you can't store none and replicate the tail).
 
 ##### %unsubscribe
 
@@ -104,7 +104,7 @@ Now every time a node receives an entry from this author (after the timestamp) i
 
 Details and options are the same as for subscribe
 
-Entries commited to a nodes local feed as a result of delegation must contain an additional field at the top level `onBehalfOf` which is the feed key of the node which this one delegated to.
+Entries committed to a nodes local feed as a result of delegation must contain an additional field at the top level `onBehalfOf` which is the feed key of the node which this one delegated to.
 
 ##### %undelegate
 
