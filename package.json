@@ -29,7 +29,7 @@
     "files": [
       "test/**/*",
       "!test/test-utils.js",
-      "!test/multi-node-bootstrapper.js"
+      "!test/multi-node/multi-node-bootstrapper.js"
     ]
   }
 }
