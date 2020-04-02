@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const { head, subscribe, grant, authorEntry } = require('../../lib/promise')
+const { subscribe, grant, authorEntry } = require('../../lib/promise')
 const { bootstrapNodes } = require('./multi-node-bootstrapper')
 
 test('A node can subscribe to another using replication streams', async t => {
@@ -12,11 +12,11 @@ test('A node can subscribe to another using replication streams', async t => {
   await grant(alice, 1, bob.feedKey())
 
   // bob authors a remote author entry
-  const bobEntry = await authorEntry(bob, 0, '%remoteauthor', { remoteContent: { type: 'FROM_BOB' } }, 100)
+  await authorEntry(bob, 0, '%remoteauthor', { remoteContent: { type: 'FROM_BOB' } }, 100)
 
   // wait for this to trigger alice authoring a new entry
   const aliceLastEntry = await new Promise((resolve, reject) => {
-    alice.on(`authoredEntry`, (data) => {
+    alice.on('authoredEntry', (data) => {
       resolve(data)
     })
   })
