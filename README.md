@@ -1,12 +1,12 @@
 # Plasmid
 
-PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both SecureScuttlebutt (SSB) and Holochain but takes into account the requirements of lightweight IoT devices. 
+PubSub messaging protocol based on Hypercore. It is inspired by both SecureScuttlebutt (SSB) and Holochain but takes into account the requirements of lightweight IoT devices. 
 
 [Read the docs here](https://redgridone.github.io/plasmid/)
 
 ## Overview
 
-Being based on Hypercore/Hyperswarm which are major components of the DAT protocol it shares much of its codebase. DAT adds a filesystem abstraction on top of single-author message feeds while Plasmid adds dynamic multi-feed PubSub style subscriptions and messaging based events.
+Being based on Hypercore which are major components of the DAT protocol it shares much of its codebase. DAT adds a filesystem abstraction on top of single-author message feeds while Plasmid adds dynamic multi-feed PubSub style subscriptions and messaging based events.
 
 ## Functionality inherited from DAT
 
@@ -19,12 +19,6 @@ The Merkle tree structure has an added advantage over hash-chain based append on
 A non-author wishing to verify part of the feed must request a subset of the tree hashes signed by the author. This allows them to verify ordering and authorship on a partial chunk. This is similar to how file chunks are verified in BitTorrent. 
 
 A messaging protocol allows peers to request subsets of the feed from the author or from each other. It also allows peers to notify each other of new messages as they are created so they can be propagated in close to real time.
-
-### Hyperswarm
-
-This is the peer-to-peer networking and discovery layer. Without going into too much detail it allows the discovery of peers via a number of different methods (both distributed and centralised) and connects them over a socket connection. Peers advertise the topic they have and different topics they are interested in to connect with other peers.
-
-In this protocol (similar to DAT) the topic is the public key of the feed.
     
 ## Added Functionality
 
