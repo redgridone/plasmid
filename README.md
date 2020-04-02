@@ -87,7 +87,7 @@ As expected this is how a node can unsubscrbe from a feed. This will also remove
 
 #### Granting authoring access to remote nodes
 
-Another feature of Plasmid is the ability a node to grant authoring capabilities to other nodes. This is a particularly useful feature for remote IoT devices as it allows a managing device to modify its state (if it has the required permission).
+Another feature of Plasmid is the ability a node to grant authoring capabilities to other nodes. This is a particularly useful feature for remote IoT devices as it allows a managing device to modify its state (if it has the required permission). For remote authored messages to work you must also subscribe to the authoring node.
 
 ##### %grant
 
