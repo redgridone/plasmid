@@ -27,6 +27,18 @@ test('Networking works with multiple nodes', async t => {
 
   await subscribe(alice, 0, bob.feedKey(), {}, {})
 
+  // wait and check that a connection between alice and bob is made
+  const aliceInfo = await new Promise((resolve, reject) => {
+    aliceReplicator.on('connection', info => {
+      resolve(info)
+    })
+  })
+  const bobInfo = await new Promise((resolve, reject) => {
+    bobReplicator.on('connection', info => {
+      resolve(info)
+    })
+  })
+
   // bob authors an entry to their feed
   const bobEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
 
