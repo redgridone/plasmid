@@ -21,6 +21,7 @@
     "jsdoc": "^3.6.3"
   },
   "dependencies": {
+    "docdash": "^1.2.0",
     "hypercore": "^8.11.1",
     "hyperswarm": "^2.9.0",
     "jsonschema": "^1.2.5"

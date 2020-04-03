@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>promise - Documentation</title>
+    <title>Replicator - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">promise</h1>
+    <h1 class="page-title">Replicator</h1>
     
 
     
@@ -44,8 +44,14 @@
 
 <header>
     
+        <h2>
+        Replicator
+        </h2>
         
-            
+            <div class="class-description usertext">Set up a node to replicate its own feed and any feeds it subscribes to
+Makes use of Hyperswarm to locate other peers who have or are interested in the feeds this node has
+Currently this creates a swarm instance per foreign feed and does not reuse connections.
+This can probably be improved upon in the future using multiplexing</div>
         
     
 </header>
@@ -55,11 +61,14 @@
         <div class="container-overview">
         
             
-                <div class="description usertext">Add a promise interface to a plasmid node</div>
-            
 
-            
-                
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Replicator"><span class="type-signature"></span>new Replicator<span class="signature">(node, options)</span><span class="type-signature"></span></h4>
+
+    
 
 
 
@@ -69,7 +78,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="promise.js.html">promise.js</a>, <a href="promise.js.html#line1">line 1</a>
+        <a href="replicator.js.html">replicator.js</a>, <a href="replicator.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -118,24 +127,95 @@
 
 
 
+    <h5>Parameters:</h5>
+    
 
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
+        <th>Type</th>
 
+        
 
+        
 
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
+    <tbody>
+    
 
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
 
-
-
-
-
-
-
-
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Node.html">Node</a></span>
 
 
             
+            </td>
+
+            
+
+            
+
+            <td class="description last">The node to replicate</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The options object passed directly to the hyperswarm constructor</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         </div>
     

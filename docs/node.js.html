@@ -1,23 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="utf-8">
-    <title>JSDoc: Source: node.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <title>node.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Source: node.js</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Node.html">Node</a><ul class='methods'><li data-type='method'><a href="Node.html#close">close</a></li><li data-type='method'><a href="Node.html#createReadStream">createReadStream</a></li><li data-type='method'><a href="Node.html#createWriteStream">createWriteStream</a></li></ul></li><li><a href="Replicator.html">Replicator</a></li></ul><h3>Modules</h3><ul><li><a href="module-entries.html">entries</a><ul class='methods'><li data-type='method'><a href="module-entries.html#~newEntry">newEntry</a></li><li data-type='method'><a href="module-entries.html#~validateEntry">validateEntry</a></li></ul></li><li><a href="module-plasmid.html">plasmid</a></li><li><a href="module-promise.html">promise</a></li></ul><h3>Global</h3><ul><li><a href="global.html#feedKeyToTopic">feedKeyToTopic</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">node.js</h1>
+    
 
     
 
@@ -28,10 +44,12 @@
         <article>
             <pre class="prettyprint source linenums"><code>const EventEmitter = require('events')
 const fs = require('fs')
+const { validate } = require('jsonschema')
 
 const hypercore = require('hypercore')
 
 const {
+  newEntry,
   validateEntry,
   SYS_ENTRIES
 } = require('./entries')
@@ -48,8 +66,7 @@ class Node extends EventEmitter {
     this.foreignFeeds = {}
     this.feedAliases = {} // maps from an alias string to a feed key
     this.feedReadStreams = {}
-    this.delegateFeeds = {}
-    this.delegateReadStreams = {}
+    this.capabilities = {} // maps from feedKey to list of schemas that content they are granted to author on this nodes feed
 
     if (!fs.existsSync(this.storagePath)) {
       fs.mkdirSync(this.storagePath, { recursive: true })
@@ -84,16 +101,16 @@ class Node extends EventEmitter {
           case SYS_ENTRIES.UNSUBSCRIBE:
             this._unsubscribe(data)
             break
-          case SYS_ENTRIES.DELEGATE:
-            this._subscribeDelegate(data)
+          case SYS_ENTRIES.GRANT:
+            this._grant(data)
             break
-          case SYS_ENTRIES.UNDELEGATE:
-            this._unsubscribeDelegate(data)
+          case SYS_ENTRIES.REVOKE:
+            this._revoke(data)
             break
           default:
             // a non-system entry was authored
-            this.emit('authoredEntry', data)
         }
+        this.emit('authoredEntry', data)
       })
   }
 
@@ -143,6 +160,10 @@ class Node extends EventEmitter {
     return this.feed.key.toString('hex')
   }
 
+  feedKeyBuffer () {
+    return this.feed.key
+  }
+
   /* ----------  Internal methods  ---------- */
 
   _subscribe ({ timestamp, content: { feedKey, details, options } }) {
@@ -152,6 +173,7 @@ class Node extends EventEmitter {
     })
     feed.on('ready', () => {
       this.foreignFeeds[feedKey] = feed
+      this.emit('subscribed', feedKey)
       this.emit(`subscribed:${feedKey}`, details, options)
     })
     // if provided, also register under the alias
@@ -168,6 +190,19 @@ class Node extends EventEmitter {
           Object.keys(this.feedAliases)
             .filter(alias => this.feedAliases[alias] === feedKey)
             .forEach(alias => this.emit(`newData:${alias}`, data, details))
+
+          // check of this is a remote author request and we have granted capabilities for this content
+          if (data.content.type === SYS_ENTRIES.REMOTE_AUTHOR &amp;&amp;
+              this.capabilities[feedKey] &amp;&amp;
+              validate(data.content.remoteContent, this.capabilities[feedKey]).valid) {
+            this.feed.append(newEntry(
+              this.feedKey(),
+              this.feed.length,
+              new Date().getTime(),
+              data.content.remoteContent,
+              data.author // the remote author
+            ))
+          }
         }
       })
   }
@@ -176,6 +211,7 @@ class Node extends EventEmitter {
     this.feedReadStreams[feedKey].destroy()
     this.foreignFeeds[feedKey].destroy(() => {
       delete this.foreignFeeds[feedKey]
+      this.emit('unsubscribed', feedKey)
       this.emit(`unsubscribed:${feedKey}`)
       // also unregister any aliases
       Object.keys(this.feedAliases)
@@ -187,31 +223,14 @@ class Node extends EventEmitter {
     })
   }
 
-  _subscribeDelegate ({ timestamp, content: { feedKey, details, options } }) {
-    const feed = hypercore(`${this.storagePath}/${feedKey}`, feedKey, {
-      valueEncoding: 'json',
-      sparse: true
-    })
-    feed.on('ready', () => {
-      this.delegateFeeds[feedKey] = feed
-      this.emit(`delegating:${feedKey}`, details, options)
-    })
-    // stream from the delegate feed into the node feed
-    // TODO: Rewrite this to make better use of streams
-    this.delegateReadStreams[feedKey] = feed.createReadStream({ live: true, tail: true, snapshot: false })
-      .on('data', (data) => {
-        if (data.timestamp > timestamp) {
-          this.authorEntry({ onBehalfOf: feedKey, ...data })
-        }
-      })
+  _grant ({ content: { feedKey, contentValidationSchema } }) {
+    this.capabilities[feedKey] = contentValidationSchema
+    this.emit(`grant:${feedKey}`)
   }
 
-  _unsubscribeDelegate ({ content: { feedKey } }) {
-    this.delegateReadStreams[feedKey].destroy()
-    this.delegateFeeds[feedKey].destroy(() => {
-      delete this.delegateFeeds[feedKey]
-      this.emit(`undelegated:${feedKey}`)
-    })
+  _revoke ({ content: { feedKey } }) {
+    delete this.capabilities[feedKey]
+    this.emit(`revoke:${feedKey}`)
   }
 }
 
@@ -223,19 +242,21 @@ module.exports = Node
 
 
 
+    
+    
 </div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-entries.html">entries</a></li><li><a href="module-plasmid.html">plasmid</a></li><li><a href="module-promise.html">promise</a></li></ul><h3>Classes</h3><ul><li><a href="Node.html">Node</a></li></ul>
-</nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Apr 02 2020 10:31:20 GMT+1100 (Australian Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Fri Apr 03 2020 17:28:41 GMT+1100 (Australian Eastern Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
 </body>
 </html>

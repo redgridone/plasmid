@@ -6,6 +6,7 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
+        "template": "node_modules/docdash",
         "destination": "./docs/",
         "recurse": true
     }
