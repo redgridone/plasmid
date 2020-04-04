@@ -1,0 +1,2 @@
+{"author":"d54af5d2e995c79ccb36ce81d1243baf6655a9b47f348b79e9f0368e461b5581","sequence":0,"timestamp":0,"content":{"type":"%subscribe","feedKey":"12a95ee61c7959eeb25b6efaba65dabb291c5b33a9134d7cb787f5a6185856aa","details":{},"options":{"alias":"some-alias"}}}
+{"author":"d54af5d2e995c79ccb36ce81d1243baf6655a9b47f348b79e9f0368e461b5581","sequence":1,"timestamp":0,"content":{"type":"%unsubscribe","feedKey":"12a95ee61c7959eeb25b6efaba65dabb291c5b33a9134d7cb787f5a6185856aa"}}

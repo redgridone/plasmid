@@ -1,35 +1,7 @@
 {
-  "name": "plasmid",
-  "version": "0.0.1",
-  "description": "A distributed pubsub messaging protocol built on Hypercore",
-  "main": "lib/index.js",
-  "scripts": {
-    "test": "rm -rf ./test/scratch && ava",
-    "lint": "eslint .",
-    "doc": "jsdoc -c ./.jsdoc.json --verbose"
-  },
-  "author": "Willem Olding <@wollum>",
-  "license": "MIT",
+  "name": "root",
+  "private": true,
   "devDependencies": {
-    "ava": "^3.5.1",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "jsdoc": "^3.6.3"
-  },
-  "dependencies": {
-    "hypercore": "^8.11.1",
-    "hyperswarm": "^2.9.0",
-    "jsonschema": "^1.2.5"
-  },
-  "ava": {
-    "files": [
-      "test/**/*",
-      "!test/test-utils.js",
-      "!test/multi-node/multi-node-bootstrapper.js"
-    ]
+    "lerna": "^3.20.2"
   }
 }
