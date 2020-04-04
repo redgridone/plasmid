@@ -2,9 +2,9 @@
   "name": "root",
   "private": true,
   "scripts": {
-  	"bootstrap": "lerna bootstrap",
-  	"test": "lerna run test",
-  	"lint": "lerna run lint"
+    "bootstrap": "lerna bootstrap",
+    "test": "lerna run test",
+    "lint": "lerna run lint"
   },
   "devDependencies": {
     "ava": "^3.5.1",
@@ -18,7 +18,7 @@
     "lerna": "^3.20.2"
   },
   "dependencies": {
-    "plasmid": "file:packages/plasmid-core",
+    "plasmid-core": "file:packages/plasmid-core",
     "plasmid-replicator": "file:packages/plasmid-replicator"
   }
 }

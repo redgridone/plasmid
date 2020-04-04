@@ -125,6 +125,7 @@ class Node extends EventEmitter {
     })
     feed.on('ready', () => {
       this.foreignFeeds[feedKey] = feed
+      this.emit('subscribed', feedKey)
       this.emit(`subscribed:${feedKey}`, details, options)
     })
     // if provided, also register under the alias
@@ -162,6 +163,7 @@ class Node extends EventEmitter {
     this.feedReadStreams[feedKey].destroy()
     this.foreignFeeds[feedKey].destroy(() => {
       delete this.foreignFeeds[feedKey]
+      this.emit('unsubscribed', feedKey)
       this.emit(`unsubscribed:${feedKey}`)
       // also unregister any aliases
       Object.keys(this.feedAliases)

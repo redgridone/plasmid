@@ -1,6 +1,6 @@
 const test = require('ava')
 const { newScratchDir } = require('./test-utils')
-const { initNode, subscribe, unsubscribe, head } = require('../lib/promise')
+const { initNode, subscribe, unsubscribe, head } = require('../lib').promise
 
 const testKey = '0'.repeat(64)
 const expectedSubscribeContent = {

@@ -7,7 +7,7 @@
  */
 
 const { newScratchDir } = require('../test-utils')
-const { initNode } = require('../../lib/promise')
+const { initNode } = require('../../lib').promise
 
 module.exports.bootstrapNodes = async function (nNodes) {
   const nodes = {}

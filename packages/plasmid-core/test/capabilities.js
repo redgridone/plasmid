@@ -1,7 +1,7 @@
 const test = require('ava')
 
 const { newScratchDir } = require('./test-utils')
-const { initNode, grant, revoke } = require('../lib/promise')
+const { initNode, grant, revoke } = require('../lib').promise
 
 const testKey = 'XYZ'
 
