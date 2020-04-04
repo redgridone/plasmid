@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const { subscribe, unsubscribe, authorEntry } = require('../../lib/promise')
+const { subscribe, unsubscribe, authorEntry } = require('../../lib').promise
 const { bootstrapNodes } = require('./multi-node-bootstrapper')
 
 test('A node can subscribe to another using replication streams', async t => {
