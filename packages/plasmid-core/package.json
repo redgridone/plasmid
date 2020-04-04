@@ -1,0 +1,27 @@
+{
+  "name": "plasmid-core",
+  "version": "0.0.1",
+  "description": "A distributed pubsub messaging protocol built on Hypercore",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "rm -rf ./test/scratch && ava",
+    "lint": "eslint .",
+    "doc": "jsdoc -c ./.jsdoc.json --verbose"
+  },
+  "author": "Willem Olding <@wollum>",
+  "license": "MIT",
+  "dependencies": {
+    "ava": "^3.5.2",
+    "eslint": "^6.8.0",
+    "hypercore": "^8.11.1",
+    "hyperswarm": "^2.9.0",
+    "jsonschema": "^1.2.5"
+  },
+  "ava": {
+    "files": [
+      "test/**/*",
+      "!test/test-utils.js",
+      "!test/multi-node/multi-node-bootstrapper.js"
+    ]
+  }
+}
