@@ -1,3 +1,0 @@
-{"author":"02e0767f31b99c81245c15c6eb6213d2ac0288adbd251cb8b7a601409be33ae8","sequence":0,"timestamp":0,"content":{"type":"%subscribe","feedKey":"dbe67c4c702cc98c8c5ecfeceb9681fa17bd05b3ec403746ccf65fe577892501","details":{},"options":{}}}
-{"author":"02e0767f31b99c81245c15c6eb6213d2ac0288adbd251cb8b7a601409be33ae8","sequence":1,"timestamp":0,"content":{"type":"%grant","feedKey":"dbe67c4c702cc98c8c5ecfeceb9681fa17bd05b3ec403746ccf65fe577892501","contentValidationSchema":{}}}
-{"author":"02e0767f31b99c81245c15c6eb6213d2ac0288adbd251cb8b7a601409be33ae8","sequence":2,"timestamp":1585966075227,"content":{"type":"FROM_BOB"},"remoteAuthor":"dbe67c4c702cc98c8c5ecfeceb9681fa17bd05b3ec403746ccf65fe577892501"}

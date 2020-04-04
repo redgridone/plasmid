@@ -1,2 +1,0 @@
-{"author":"16f6876f32109cffa920860527fb22b5d20ba798357b84e96d45fe7b5e932105","sequence":0,"timestamp":0,"content":{"type":"%grant","feedKey":"XYZ","contentValidationSchema":{}}}
-{"author":"16f6876f32109cffa920860527fb22b5d20ba798357b84e96d45fe7b5e932105","sequence":1,"timestamp":0,"content":{"type":"%revoke","feedKey":"XYZ"}}

@@ -1,2 +1,0 @@
-{"author":"1fdd61624deb409717d12d78302bc3c3fd8da4bd6215e809a27e2a549e0e1e58","sequence":0,"timestamp":0,"content":{"type":"%subscribe","feedKey":"849d536d033ee500d61ec458f1d1ac4e08cdfbbb685ece5f431aff5b3016717c","details":{},"options":{}}}
-{"author":"1fdd61624deb409717d12d78302bc3c3fd8da4bd6215e809a27e2a549e0e1e58","sequence":1,"timestamp":100,"content":{"type":"HELLO","msg":"hi from alice"}}
