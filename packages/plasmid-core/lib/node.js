@@ -125,12 +125,12 @@ class Node extends EventEmitter {
     })
     feed.on('ready', () => {
       this.foreignFeeds[feedKey] = feed
+      this.emit('subscribed', feedKey)
       this.emit(`subscribed:${feedKey}`, details, options)
     })
     // if provided, also register under the alias
     if (options && options.alias && typeof options.alias === 'string') {
       this.feedAliases[options.alias] = feedKey
-      this.emit('subscribed', feedKey)
       this.emit(`subscribed:${options.alias}`, details, options)
     }
     // endless stream to emit events to consuming code
