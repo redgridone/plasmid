@@ -2,8 +2,9 @@
   "name": "root",
   "private": true,
   "scripts": {
-  	"lerna:test": "lerna run test",
-  	"lerna:lint": "lerna run lint"
+  	"bootstrap": "lerna bootstrap",
+  	"test": "lerna run test",
+  	"lint": "lerna run lint"
   },
   "devDependencies": {
     "ava": "^3.5.1",
