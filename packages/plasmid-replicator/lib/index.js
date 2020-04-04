@@ -23,7 +23,7 @@ class Replicator extends EventEmitter {
       pump(connection, stream, connection)
       this.emit('connection', info)
     })
-    // this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()))
+    this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()))
 
     node.on('subscribed', feedKey => {
       this.foreignFeedSwarms[feedKey] = hyperswarm(options)
@@ -32,12 +32,12 @@ class Replicator extends EventEmitter {
         pump(connection, stream, connection)
         this.emit('connection', info)
       })
-      // this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey))
+      this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey))
       this.emit('newSwarm', feedKey)
     })
 
     node.on('unsubscribed', feedKey => {
-      // this.foreignFeedSwarms[feedKey].leave(feedKeyToTopic(feedKey))
+      this.foreignFeedSwarms[feedKey].leave(feedKeyToTopic(feedKey))
       delete this.foreignFeedSwarms[feedKey]
       this.emit('removedSwarm', feedKey)
     })
