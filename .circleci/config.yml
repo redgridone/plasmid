@@ -11,8 +11,8 @@ jobs:
           steps:
             - run: npm install
             - run: lerna bootstrap
-            - run: lerna run lint
-            - run: lerna test
+            - run: npm run lerna:lint
+            - run: npm run lerna:test
 workflows:
     build-and-test:
       jobs:
