@@ -2,6 +2,18 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "ava": "^3.5.1",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jsdoc": "^3.6.3",
     "lerna": "^3.20.2"
+  },
+  "dependencies": {
+    "plasmid": "file:packages/plasmid-core",
+    "plasmid-replicator": "file:packages/plasmid-replicator"
   }
 }
