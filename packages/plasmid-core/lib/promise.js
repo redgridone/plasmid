@@ -29,11 +29,12 @@ module.exports.initNode = function (path) {
  * Wait for a node to author a subscribe message and initialize the foreign feed
  *
  * @param      {Node}   node           The node
- * @param      {number}   sequence       The sequence
  * @param      {string}   feedKey        The feed key
- * @param      {object}   details        The details
- * @param      {object}   options        The options
- * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
+ * @param      {object}   [details={}]       The details
+ * @param      {object}   [options={}]       The options
  * @return     {Promise}
  */
 module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options } = {}) {
@@ -54,9 +55,10 @@ module.exports.subscribe = function (node, feedKey, { sequence, timestamp, detai
  * Wait for a node to author an unsubscribe message and destroy feed
  *
  * @param      {Node}   node       The node
- * @param      {number}   sequence   The sequence
  * @param      {string}   feedKey    The feed key
- * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
 module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = {}) {
@@ -77,10 +79,11 @@ module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = 
  * Wait for a node to author a grant entry
  *
  * @param      {Node}   node                      The node
- * @param      {number}   sequence                  The sequence
  * @param      {string}   feedKey                   The feed key
- * @param      {JsonSchema}   [remoteContentSchema={}]  The remote content schema
- * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
+ * @param      {JsonSchema}   [opts.remoteContentSchema={}]  The remote content schema
  * @return     {Promise}
  */
 module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema } = {}) {
@@ -100,10 +103,11 @@ module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteCon
 /**
  * Wait for a node to author a revoke entry
  *
- * @param      {Node}   node                      The node
- * @param      {number}   sequence                  The sequence
+ * @param      {Node}     node                      The node
  * @param      {string}   feedKey                   The feed key
- * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
 module.exports.revoke = function (node, feedKey, {sequence, timestamp } = {}) {
@@ -124,10 +128,11 @@ module.exports.revoke = function (node, feedKey, {sequence, timestamp } = {}) {
  * Wait for a node to author an entry to its feed
  *
  * @param      {Node}   node           The node
- * @param      {number}   sequence       The sequence
  * @param      {string}   type           The type
  * @param      {object}   otherContent   The other content
- * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise<Object>}  The entry that was actually authored
  */
 module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp } = {}) {
