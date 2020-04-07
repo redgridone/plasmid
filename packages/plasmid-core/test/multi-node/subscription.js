@@ -25,7 +25,7 @@ test('A node can subscribe to another using replication streams', async t => {
 
 test('Can subscribe to a feed with an alias, details are passed to event', async t => {
   const [alice, bob] = await bootstrapNodes(2)
-  await subscribe(alice, bob.feedKey(), { details: { someField: 'passed-to-every-event' }, options: { alias: 'some-alias' }, timestamp: 0})
+  await subscribe(alice, bob.feedKey(), { details: { someField: 'passed-to-every-event' }, options: { alias: 'some-alias' }, timestamp: 0 })
   const bobAuthoredEntry = await authorEntry(bob, 'HELLO', {}, { timestamp: 100 })
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
     alice.on('newData:some-alias', (data, details) => {
@@ -39,7 +39,7 @@ test('Can subscribe to a feed with an alias, details are passed to event', async
 test('Subscribing different feeds to the same alias, only the later one gives events', async t => {
   const [alice, bob, carol] = await bootstrapNodes(3)
 
-  await subscribe(alice, bob.feedKey(), { options:  { alias: 'some-alias' }, timestamp: 0 })
+  await subscribe(alice, bob.feedKey(), { options: { alias: 'some-alias' }, timestamp: 0 })
   await subscribe(alice, carol.feedKey(), { options: { alias: 'some-alias' }, timestamp: 0 })
 
   await authorEntry(bob, 'HELLO', { msg: 'hi from bob' }, { timestamp: 100 })

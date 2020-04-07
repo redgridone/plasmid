@@ -110,7 +110,7 @@ module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteCon
  * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
-module.exports.revoke = function (node, feedKey, {sequence, timestamp } = {}) {
+module.exports.revoke = function (node, feedKey, { sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),
