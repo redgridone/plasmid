@@ -7,12 +7,12 @@ test('A node can subscribe to another using replication streams', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
   // alice subscribes to bob
-  await subscribe(alice, 0, bob.feedKey(), {}, {}, 0)
+  await subscribe(alice, bob.feedKey(), { timestamp: 0 })
   // alice grants bob capabilitity to publish anything
-  await grant(alice, 1, bob.feedKey(), 100)
+  await grant(alice, bob.feedKey(), { timestamp: 100 })
 
   // bob authors a remote author entry
-  await authorEntry(bob, 0, '%remoteauthor', { remoteContent: { type: 'FROM_BOB' } }, 200)
+  await authorEntry(bob, '%remoteauthor', { remoteContent: { type: 'FROM_BOB' } }, { timestamp: 200 })
 
   // wait for this to trigger alice authoring a new entry
   const aliceLastEntry = await new Promise((resolve, reject) => {

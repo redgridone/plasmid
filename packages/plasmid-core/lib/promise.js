@@ -36,11 +36,11 @@ module.exports.initNode = function (path) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.subscribe = function (node, sequence, feedKey, details, options, timestamp) {
+module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options }) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newSubscribeContent(feedKey, details, options)
     ))
@@ -59,11 +59,11 @@ module.exports.subscribe = function (node, sequence, feedKey, details, options, 
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
+module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp }) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newUnsubscribeContent(feedKey)
     ))
@@ -83,11 +83,11 @@ module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = {}, timestamp) {
+module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema }) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newGrantContent(feedKey, remoteContentSchema)
     ))
@@ -106,11 +106,11 @@ module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = 
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.revoke = function (node, sequence, feedKey, timestamp) {
+module.exports.revoke = function (node, feedKey, {sequence, timestamp }) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newRevokeContent(feedKey)
     ))
@@ -130,11 +130,11 @@ module.exports.revoke = function (node, sequence, feedKey, timestamp) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise<Object>}  The entry that was actually authored
  */
-module.exports.authorEntry = function (node, sequence, type, otherContent, timestamp) {
+module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp }) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       {
         type,
@@ -167,5 +167,13 @@ function getOrUseTimestamp (timestamp) {
     return timestamp
   } else {
     return new Date().getTime()
+  }
+}
+
+function getOrUseSequence (node, sequence) {
+  if (typeof sequence === 'number') {
+    return sequence
+  } else {
+    return node.feed.length
   }
 }
