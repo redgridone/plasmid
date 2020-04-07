@@ -15,7 +15,6 @@ const pump = require('pump')
  * // The feeds of this node are now replicated peer-to-peer!
  */
 class Replicator extends EventEmitter {
-
   /**
    * Construct a new replicator instance.
    *
