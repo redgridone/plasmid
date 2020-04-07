@@ -17,34 +17,50 @@ class Replicator extends EventEmitter {
     super()
     this.deviceFeedSwarm = hyperswarm(options)
     this.foreignFeedSwarms = {}
+    this.node = node
 
-    this.deviceFeedSwarm.on('connection', function (connection, info) {
-      const stream = node.createReplicationStream(null, info.client, {})
-      pump(connection, stream, connection)
-      this.emit('connection', info)
-    })
+    this.deviceFeedSwarm
+      .on('connection', (connection, info) => this._handleConnection(null, connection, info))
     this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()))
 
     node.on('subscribed', feedKey => {
       this.foreignFeedSwarms[feedKey] = hyperswarm(options)
-      this.foreignFeedSwarms[feedKey].on('connection', function (connection, info) {
-        const stream = node.createReplicationStream(feedKey, info.client, {})
-        pump(connection, stream, connection)
-        this.emit('connection', info)
-      })
+      this.foreignFeedSwarms[feedKey]
+        .on('connection', (connection, info) => this._handleConnection(feedKey, connection, info))
       this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey))
+      /**
+       * New swarm created event
+       * @event Replicator#newSwarm
+       * @type string
+       */
       this.emit('newSwarm', feedKey)
     })
 
     node.on('unsubscribed', feedKey => {
       this.foreignFeedSwarms[feedKey].leave(feedKeyToTopic(feedKey))
       delete this.foreignFeedSwarms[feedKey]
+      /**
+       * Swarm removed event
+       * @event Replicator#removedSwarm
+       * @type string
+       */
       this.emit('removedSwarm', feedKey)
     })
   }
 
   deviceSwarm () {
     return this.deviceSwarm
+  }
+
+  _handleConnection (feedKey, connection, info) {
+    const stream = this.node.createReplicationStream(feedKey, info.client, {})
+    pump(connection, stream, connection)
+    /**
+     * New connection event
+     * @event Replicator#connection
+     * @type object
+     */
+    this.emit('connection', info)
   }
 }
 
