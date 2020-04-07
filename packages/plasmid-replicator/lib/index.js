@@ -18,16 +18,17 @@ class Replicator extends EventEmitter {
     this.deviceFeedSwarm = hyperswarm(options)
     this.foreignFeedSwarms = {}
     this.node = node
+    this.peers = {} // maps from feedKeys to a list of peers
 
     this.deviceFeedSwarm
       .on('connection', (connection, info) => this._handleConnection(null, connection, info))
-    this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()))
+    this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()), { lookup: true, announce: true })
 
     node.on('subscribed', feedKey => {
       this.foreignFeedSwarms[feedKey] = hyperswarm(options)
       this.foreignFeedSwarms[feedKey]
         .on('connection', (connection, info) => this._handleConnection(feedKey, connection, info))
-      this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey))
+      this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey), { lookup: true, announce: true })
       /**
        * New swarm created event
        * @event Replicator#newSwarm
@@ -53,7 +54,7 @@ class Replicator extends EventEmitter {
   }
 
   _handleConnection (feedKey, connection, info) {
-    const stream = this.node.createReplicationStream(feedKey, info.client, {})
+    const stream = this.node.createReplicationStream(feedKey, info.client, { live: true })
     pump(connection, stream, connection)
     /**
      * New connection event
