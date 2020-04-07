@@ -35,6 +35,7 @@ lerna run test
 ## Examples running a plasmid node
 
 ```javascript
+const { Node } = require('plasmid-core')
 const { initNode, subscribe } = require('plasmid-core').promise
 const Replicator = require('plasmid-replicator')
 
