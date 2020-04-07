@@ -39,11 +39,10 @@ async function main () {
   const node = await initNode(persistencePath)
   console.log('Starting replicator...')
   const replicator = new Replicator(node)
-
   console.log('Stating HTTP interface')
   const app = express()
   app.use(cors())
-  setupHttp(app, node)
+  setupHttp(app, node, replicator)
   const swaggerSpec = swaggerJSDoc(swaggerDocOpts)
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
   app.listen(port, () => console.log(`Listening for commands on HTTP ${port}`))
