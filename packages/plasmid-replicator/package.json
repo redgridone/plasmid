@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "rm -rf ./test/scratch && ava",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "doc": "jsdoc -c ./.jsdoc.json --verbose"
   },
   "author": "Willem Olding <@wollum>",
   "license": "MIT",

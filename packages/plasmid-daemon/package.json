@@ -11,6 +11,7 @@
   "dependencies": {
     "ava": "^3.5.2",
     "cors": "^2.8.5",
+    "docdash": "^1.2.0",
     "express": "^4.17.1",
     "plasmid-core": "^0.0.1",
     "plasmid-replicator": "^0.0.1",

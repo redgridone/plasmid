@@ -1,23 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="utf-8">
-    <title>JSDoc: Source: promise.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <title>promise.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Source: promise.js</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Node.html">Node</a><ul class='methods'><li data-type='method'><a href="Node.html#close">close</a></li><li data-type='method'><a href="Node.html#createReadStream">createReadStream</a></li><li data-type='method'><a href="Node.html#createReplicationStream">createReplicationStream</a></li><li data-type='method'><a href="Node.html#createWriteStream">createWriteStream</a></li><li data-type='method'><a href="Node.html#feedKey">feedKey</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-entries.html">entries</a><ul class='methods'><li data-type='method'><a href="module-entries.html#~newEntry">newEntry</a></li><li data-type='method'><a href="module-entries.html#~validateEntry">validateEntry</a></li></ul></li><li><a href="module-promise.html">promise</a><ul class='methods'><li data-type='method'><a href="module-promise.html#.authorEntry">authorEntry</a></li><li data-type='method'><a href="module-promise.html#.grant">grant</a></li><li data-type='method'><a href="module-promise.html#.head">head</a></li><li data-type='method'><a href="module-promise.html#.initNode">initNode</a></li><li data-type='method'><a href="module-promise.html#.revoke">revoke</a></li><li data-type='method'><a href="module-promise.html#.subscribe">subscribe</a></li><li data-type='method'><a href="module-promise.html#.unsubscribe">unsubscribe</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Node.html#event:authoredEntry">authoredEntry</a></li><li><a href="Node.html#event:ready">ready</a></li><li><a href="Node.html#event:subscribed">subscribed</a></li><li><a href="Node.html#event:unsubscribed">unsubscribed</a></li><li><a href="Node.html#event:grant:%257BfeedKey%257D">grant:{feedKey}</a></li><li><a href="Node.html#event:newData:%257Balias%257D">newData:{alias}</a></li><li><a href="Node.html#event:newData:%257BfeedKey%257D">newData:{feedKey}</a></li><li><a href="Node.html#event:revoke:%257BfeedKey%257D">revoke:{feedKey}</a></li><li><a href="Node.html#event:subscribed:%257Balias%257D">subscribed:{alias}</a></li><li><a href="Node.html#event:subscribed:%257BfeedKey%257D">subscribed:{feedKey}</a></li><li><a href="Node.html#event:unsubscribed:%257Balias%257D">unsubscribed:{alias}</a></li><li><a href="Node.html#event:unsubscribed:%257BfeedKey%257D">unsubscribed:{feedKey}</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">promise.js</h1>
+    
 
     
 
@@ -27,14 +43,20 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * Add a promise interface to a plasmid node
+ * A promise based API to make working with plasmid node objects a breeze
  * @module promise
  */
 
 const Node = require('./node')
-const { newEntry, newSubscribeContent, newUnsubscribeContent } = require('./entries')
+const { newEntry, newSubscribeContent, newUnsubscribeContent, newGrantContent, newRevokeContent } = require('./entries')
 
-function initNode (path) {
+/**
+ * Initialize a new node and wait for it to be ready
+ *
+ * @param      {string}   path    The path to use for the node persistent storage
+ * @return     {Promise&lt;Node>}  Promise that resolves with the newly initialized node
+ */
+module.exports.initNode = function (path) {
   return new Promise((resolve, reject) => {
     const n = new Node(path)
     n.on('ready', (err) => {
@@ -47,12 +69,23 @@ function initNode (path) {
   })
 }
 
-function subscribe (node, sequence, feedKey, details, options, timestamp = 0) {
+/**
+ * Wait for a node to author a subscribe message and initialize the foreign feed
+ *
+ * @param      {Node}   node           The node
+ * @param      {number}   sequence       The sequence
+ * @param      {string}   feedKey        The feed key
+ * @param      {object}   details        The details
+ * @param      {object}   options        The options
+ * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.subscribe = function (node, sequence, feedKey, details, options, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newSubscribeContent(feedKey, details, options)
     ))
     node.on(`subscribed:${feedKey}`, () => {
@@ -61,12 +94,21 @@ function subscribe (node, sequence, feedKey, details, options, timestamp = 0) {
   })
 }
 
-function unsubscribe (node, sequence, feedKey, timestamp = 0) {
+/**
+ * Wait for a node to author an unsubscribe message and destroy feed
+ *
+ * @param      {Node}   node       The node
+ * @param      {number}   sequence   The sequence
+ * @param      {string}   feedKey    The feed key
+ * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newUnsubscribeContent(feedKey)
     ))
     node.on(`unsubscribed:${feedKey}`, () => {
@@ -75,12 +117,69 @@ function unsubscribe (node, sequence, feedKey, timestamp = 0) {
   })
 }
 
-function authorEntry (node, sequence, type, otherContent, timestamp = 0) {
+/**
+ * Wait for a node to author a grant entry
+ *
+ * @param      {Node}   node                      The node
+ * @param      {number}   sequence                  The sequence
+ * @param      {string}   feedKey                   The feed key
+ * @param      {JsonSchema}   [remoteContentSchema={}]  The remote content schema
+ * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = {}, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
+      newGrantContent(feedKey, remoteContentSchema)
+    ))
+    node.on(`grant:${feedKey}`, () => {
+      resolve()
+    })
+  })
+}
+
+/**
+ * Wait for a node to author a revoke entry
+ *
+ * @param      {Node}   node                      The node
+ * @param      {number}   sequence                  The sequence
+ * @param      {string}   feedKey                   The feed key
+ * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.revoke = function (node, sequence, feedKey, timestamp) {
+  return new Promise((resolve, reject) => {
+    node.createWriteStream().write(newEntry(
+      node.feed.key.toString('hex'),
+      sequence,
+      getOrUseTimestamp(timestamp),
+      newRevokeContent(feedKey)
+    ))
+    node.on(`revoke:${feedKey}`, () => {
+      resolve()
+    })
+  })
+}
+
+/**
+ * Wait for a node to author an entry to its feed
+ *
+ * @param      {Node}   node           The node
+ * @param      {number}   sequence       The sequence
+ * @param      {string}   type           The type
+ * @param      {object}   otherContent   The other content
+ * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @return     {Promise&lt;Object>}  The entry that was actually authored
+ */
+module.exports.authorEntry = function (node, sequence, type, otherContent, timestamp) {
+  return new Promise((resolve, reject) => {
+    node.createWriteStream().write(newEntry(
+      node.feed.key.toString('hex'),
+      sequence,
+      getOrUseTimestamp(timestamp),
       {
         type,
         ...otherContent
@@ -92,7 +191,13 @@ function authorEntry (node, sequence, type, otherContent, timestamp = 0) {
   })
 }
 
-function head (node) {
+/**
+ * Get the entry at the top of this nodes feed
+ *
+ * @param      {Node}   node    The node
+ * @return     {Promise&lt;Object>}  Entry at the top of the nodes feed
+ */
+module.exports.head = function (node) {
   return new Promise((resolve, reject) => {
     node.feed.head({}, (err, data) => {
       if (err) throw err
@@ -101,12 +206,12 @@ function head (node) {
   })
 }
 
-module.exports = {
-  initNode,
-  head,
-  subscribe,
-  unsubscribe,
-  authorEntry
+function getOrUseTimestamp (timestamp) {
+  if (typeof timestamp === 'number') {
+    return timestamp
+  } else {
+    return new Date().getTime()
+  }
 }
 </code></pre>
         </article>
@@ -115,19 +220,21 @@ module.exports = {
 
 
 
+    
+    
 </div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-entries.html">entries</a></li><li><a href="module-plasmid.html">plasmid</a></li><li><a href="module-promise.html">promise</a></li></ul><h3>Classes</h3><ul><li><a href="Node.html">Node</a></li></ul>
-</nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Apr 02 2020 10:31:20 GMT+1100 (Australian Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Tue Apr 07 2020 17:44:18 GMT+1000 (Australian Eastern Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
 </body>
 </html>

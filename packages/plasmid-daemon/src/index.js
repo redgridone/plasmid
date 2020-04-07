@@ -39,6 +39,13 @@ async function main () {
   const node = await initNode(persistencePath)
   console.log('Starting replicator...')
   const replicator = new Replicator(node)
+  replicator.on('connection', info => {
+    console.log('Peer joined', info.peer)
+  })
+  replicator.on('disconnection', info => {
+    console.log('Peer dropped,', info.peer)
+  })
+
   console.log('Stating HTTP interface')
   const app = express()
   app.use(cors())

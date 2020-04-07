@@ -7,7 +7,7 @@ test('A node can subscribe to another using replication streams', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
   // alice subscribes to bob
-  await subscribe(alice, 0, bob.feedKey(), {}, {})
+  await subscribe(alice, 0, bob.feedKey(), {}, {}, 0)
 
   // bob authors an entry to their feed
   const bobEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
@@ -25,7 +25,7 @@ test('A node can subscribe to another using replication streams', async t => {
 
 test('Can subscribe to a feed with an alias, details are passed to event', async t => {
   const [alice, bob] = await bootstrapNodes(2)
-  await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' })
+  await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' }, 0)
   const bobAuthoredEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
     alice.on('newData:some-alias', (data, details) => {
@@ -39,8 +39,8 @@ test('Can subscribe to a feed with an alias, details are passed to event', async
 test('Subscribing different feeds to the same alias, only the later one gives events', async t => {
   const [alice, bob, carol] = await bootstrapNodes(3)
 
-  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' })
-  await subscribe(alice, 1, carol.feedKey(), { }, { alias: 'some-alias' })
+  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' }, 0)
+  await subscribe(alice, 1, carol.feedKey(), { }, { alias: 'some-alias' }, 0)
 
   await authorEntry(bob, 0, 'HELLO', { msg: 'hi from bob' }, 100)
   await authorEntry(carol, 0, 'HELLO', { msg: 'hi from carol' }, 100)
@@ -57,8 +57,8 @@ test('Subscribing different feeds to the same alias, only the later one gives ev
 test('Unsubscribing removes registered alias', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
-  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' })
-  await unsubscribe(alice, 1, bob.feedKey())
+  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' }, 0)
+  await unsubscribe(alice, 1, bob.feedKey(), 1)
 
   t.is(alice.feedAliases['some-alias'], undefined)
 })

@@ -1,12 +1,18 @@
 /**
- * Add a promise interface to a plasmid node
+ * A promise based API to make working with plasmid node objects a breeze
  * @module promise
  */
 
 const Node = require('./node')
 const { newEntry, newSubscribeContent, newUnsubscribeContent, newGrantContent, newRevokeContent } = require('./entries')
 
-function initNode (path) {
+/**
+ * Initialize a new node and wait for it to be ready
+ *
+ * @param      {string}   path    The path to use for the node persistent storage
+ * @return     {Promise<Node>}  Promise that resolves with the newly initialized node
+ */
+module.exports.initNode = function (path) {
   return new Promise((resolve, reject) => {
     const n = new Node(path)
     n.on('ready', (err) => {
@@ -19,12 +25,23 @@ function initNode (path) {
   })
 }
 
-function subscribe (node, sequence, feedKey, details, options, timestamp = 0) {
+/**
+ * Wait for a node to author a subscribe message and initialize the foreign feed
+ *
+ * @param      {Node}   node           The node
+ * @param      {number}   sequence       The sequence
+ * @param      {string}   feedKey        The feed key
+ * @param      {object}   details        The details
+ * @param      {object}   options        The options
+ * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.subscribe = function (node, sequence, feedKey, details, options, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newSubscribeContent(feedKey, details, options)
     ))
     node.on(`subscribed:${feedKey}`, () => {
@@ -33,12 +50,21 @@ function subscribe (node, sequence, feedKey, details, options, timestamp = 0) {
   })
 }
 
-function unsubscribe (node, sequence, feedKey, timestamp = 0) {
+/**
+ * Wait for a node to author an unsubscribe message and destroy feed
+ *
+ * @param      {Node}   node       The node
+ * @param      {number}   sequence   The sequence
+ * @param      {string}   feedKey    The feed key
+ * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newUnsubscribeContent(feedKey)
     ))
     node.on(`unsubscribed:${feedKey}`, () => {
@@ -47,12 +73,22 @@ function unsubscribe (node, sequence, feedKey, timestamp = 0) {
   })
 }
 
-function grant (node, sequence, feedKey, remoteContentSchema = {}, timestamp = 0) {
+/**
+ * Wait for a node to author a grant entry
+ *
+ * @param      {Node}   node                      The node
+ * @param      {number}   sequence                  The sequence
+ * @param      {string}   feedKey                   The feed key
+ * @param      {JsonSchema}   [remoteContentSchema={}]  The remote content schema
+ * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = {}, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newGrantContent(feedKey, remoteContentSchema)
     ))
     node.on(`grant:${feedKey}`, () => {
@@ -61,12 +97,21 @@ function grant (node, sequence, feedKey, remoteContentSchema = {}, timestamp = 0
   })
 }
 
-function revoke (node, sequence, feedKey, timestamp = 0) {
+/**
+ * Wait for a node to author a revoke entry
+ *
+ * @param      {Node}   node                      The node
+ * @param      {number}   sequence                  The sequence
+ * @param      {string}   feedKey                   The feed key
+ * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @return     {Promise}
+ */
+module.exports.revoke = function (node, sequence, feedKey, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       newRevokeContent(feedKey)
     ))
     node.on(`revoke:${feedKey}`, () => {
@@ -75,12 +120,22 @@ function revoke (node, sequence, feedKey, timestamp = 0) {
   })
 }
 
-function authorEntry (node, sequence, type, otherContent, timestamp = 0) {
+/**
+ * Wait for a node to author an entry to its feed
+ *
+ * @param      {Node}   node           The node
+ * @param      {number}   sequence       The sequence
+ * @param      {string}   type           The type
+ * @param      {object}   otherContent   The other content
+ * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
+ * @return     {Promise<Object>}  The entry that was actually authored
+ */
+module.exports.authorEntry = function (node, sequence, type, otherContent, timestamp) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feed.key.toString('hex'),
       sequence,
-      timestamp,
+      getOrUseTimestamp(timestamp),
       {
         type,
         ...otherContent
@@ -92,7 +147,13 @@ function authorEntry (node, sequence, type, otherContent, timestamp = 0) {
   })
 }
 
-function head (node) {
+/**
+ * Get the entry at the top of this nodes feed
+ *
+ * @param      {Node}   node    The node
+ * @return     {Promise<Object>}  Entry at the top of the nodes feed
+ */
+module.exports.head = function (node) {
   return new Promise((resolve, reject) => {
     node.feed.head({}, (err, data) => {
       if (err) throw err
@@ -101,12 +162,10 @@ function head (node) {
   })
 }
 
-module.exports = {
-  initNode,
-  head,
-  subscribe,
-  unsubscribe,
-  grant,
-  revoke,
-  authorEntry
+function getOrUseTimestamp (timestamp) {
+  if (typeof timestamp === 'number') {
+    return timestamp
+  } else {
+    return new Date().getTime()
+  }
 }

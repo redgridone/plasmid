@@ -4,15 +4,24 @@ const crypto = require('crypto')
 const pump = require('pump')
 
 /**
- * Set up a node to replicate its own feed and any feeds it subscribes to
- * Makes use of Hyperswarm to locate other peers who have or are interested in the feeds this node has
+ * Set up a node to replicate its own feed and any feeds it subscribes to.
+ * This makes use of Hyperswarm to locate other peers who have or are interested in the feeds this node has
  * Currently this creates a swarm instance per foreign feed and does not reuse connections.
- * This can probably be improved upon in the future using multiplexing
- *
- * @param      {Node}  node     The node to replicate
- * @param      {Object}  options  The options object passed directly to the hyperswarm constructor
+ * This can probably be improved upon in the future using multiplexing.
+ * @example
+ *   const { initNode } = require('plasmid-core').promise
+ * const node = await initNode('./node-storage')
+ * const replicator = new Replicator(node)
+ * // The feeds of this node are now replicated peer-to-peer!
  */
 class Replicator extends EventEmitter {
+
+  /**
+   * Construct a new replicator instance.
+   *
+   * @param      {plasmid-core}  node     A plasmid core node instance to replicate
+   * @param      {Object}  options  Options passed directly to hyperswarm constructors. Use with caution
+   */
   constructor (node, options) {
     super()
     this.deviceFeedSwarm = hyperswarm(options)
@@ -35,6 +44,7 @@ class Replicator extends EventEmitter {
       this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey), { lookup: true, announce: true })
       /**
        * New swarm created event
+       * This event is emitted whenever a node is first set up to replicate or when it adds a new subscription
        * @event Replicator#newSwarm
        * @type string
        */
@@ -46,6 +56,7 @@ class Replicator extends EventEmitter {
       delete this.foreignFeedSwarms[feedKey]
       /**
        * Swarm removed event
+       * This event is emitted when a node removes a subscription
        * @event Replicator#removedSwarm
        * @type string
        */
@@ -53,6 +64,11 @@ class Replicator extends EventEmitter {
     })
   }
 
+  /**
+   * Return the swarm for this devices own feed
+   *
+   * @return     {Hyperswarm}  The swarm instance for this nodes own feed
+   */
   deviceSwarm () {
     return this.deviceSwarm
   }
@@ -65,7 +81,8 @@ class Replicator extends EventEmitter {
       this.peers[feedKey || 'self'] = [peer, ...(this.peers[feedKey || 'self'] || [])]
     }
     /**
-     * Connect to peer event
+     * Connect to peer event.
+     * Emitted when a new peer is discovered for a feed of interest and a connection is established
      * @event Replicator#connection
      * @type object
      */
@@ -82,7 +99,8 @@ class Replicator extends EventEmitter {
       })
     }
     /**
-     * Disconnect from peer event
+     * Disconnect from peer event.
+     * Emitted when a peer is disconnected
      * @event Replicator#disconnection
      * @type object
      */
@@ -92,12 +110,6 @@ class Replicator extends EventEmitter {
 
 module.exports = Replicator
 
-/**
- * Hashes the feed key to create the topic
- *
- * @param      {string}  feedKey  The feed key
- * @return     {Buffer}  Buffer containing the hash of the key
- */
 function feedKeyToTopic (feedKey) {
   return crypto.createHash('sha256')
     .update(feedKey)

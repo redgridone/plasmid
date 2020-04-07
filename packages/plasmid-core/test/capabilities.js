@@ -7,14 +7,14 @@ const testKey = 'XYZ'
 
 test('Can commit a grant entry and this adds to this nodes capabilities', async t => {
   const n = await initNode(newScratchDir())
-  await grant(n, 0, testKey)
+  await grant(n, 0, testKey, {}, 0)
   t.deepEqual(n.capabilities[testKey], {})
 })
 
 test('Can grant and then revoke', async t => {
   const n = await initNode(newScratchDir())
-  await grant(n, 0, testKey)
+  await grant(n, 0, testKey, {}, 0)
   t.deepEqual(n.capabilities[testKey], {})
-  await revoke(n, 1, testKey)
+  await revoke(n, 1, testKey, 0)
   t.is(n.capabilities[testKey], undefined)
 })
