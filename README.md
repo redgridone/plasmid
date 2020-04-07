@@ -19,6 +19,14 @@ npm install # installs lerna
 npm run bootstrap # installs other dependencies and links packages together
 ```
 
+You can start a plasmid daemon that persists to a local dir and listens on port 3000 by running the following: 
+
+```bash
+lerna run start --stream --scope plasmid-daemon -- ./scratch/persist/ 3000
+```
+
+This hosts it own swagger docs at [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/)!
+
 Run tests over all modules by running from the project root
 ```bash
 lerna run test
