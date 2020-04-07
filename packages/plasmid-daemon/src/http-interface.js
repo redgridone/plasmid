@@ -1,4 +1,4 @@
-const { subscribe } = require('plasmid-core').promise
+const { subscribe, unsubscribe, authorEntry } = require('plasmid-core').promise
 
 // takes an express app instance and a device and sets up this device daemons HTTP endpoints
 module.exports = (app, node) => {
@@ -131,9 +131,41 @@ module.exports = (app, node) => {
   /**
    * @swagger
    *
+   * /author/{type}:
+   *   post:
+   *     description: Author a new feed entry to this nodes feed
+   *     produces:
+   *       - text/plain
+   *     parameters:
+   *       - in: path
+   *         name: type
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: required type field of the entry. Can be any string.
+   *       - in: body
+   *         name: content
+   *         schema:
+   *           type: object
+   *         required: true
+   *         description: JSON content to include in the entry
+   *     responses:
+   *       200:
+   *         description: Returned if the feed was subscribed to successfully
+   */
+  app.post('/author/:type', async (req, res) => {
+    const type = req.params.type
+    const content = req.json
+    await authorEntry(node, node.feed.length, type, content)
+    res.sendStatus(200)
+  })
+
+  /**
+   * @swagger
+   *
    * /subscribe/{feedKey}:
    *   post:
-   *     description: Subscribe to the feed with the key given
+   *     description: Subscribe to the feed with the key given. Adds a subscibe entry to this nodes feed.
    *     produces:
    *       - text/plain
    *     parameters:
@@ -150,6 +182,31 @@ module.exports = (app, node) => {
   app.post('/subscribe/:feed_key([0-91-f]{64})', async (req, res) => {
     const feedKey = req.params.feed_key
     await subscribe(node, node.feed.length, feedKey, {}, {})
+    res.sendStatus(200)
+  })
+
+  /**
+   * @swagger
+   *
+   * /unsubscribe/{feedKey}:
+   *   post:
+   *     description: Unsubscribe to the feed with the key given. Adds an unsubscibe entry to this nodes feed.
+   *     produces:
+   *       - text/plain
+   *     parameters:
+   *       - in: path
+   *         name: feedKey
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: Hex encoded public key of the feed this device should unsubscribe from
+   *     responses:
+   *       200:
+   *         description: Returned if the feed was unsubscribed from successfully
+   */
+  app.post('/unsubscribe/:feed_key([0-91-f]{64})', async (req, res) => {
+    const feedKey = req.params.feed_key
+    await unsubscribe(node, node.feed.length, feedKey)
     res.sendStatus(200)
   })
 }
