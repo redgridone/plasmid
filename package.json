@@ -4,7 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "test": "lerna run test",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "doc": "lerna run doc && cp -r ./packages/plasmid-core/docs ./docs/plasmid-core && cp -r ./packages/plasmid-replicator/docs ./docs/plasmid-replicator"
   },
   "devDependencies": {
     "ava": "^3.5.1",

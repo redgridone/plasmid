@@ -1,0 +1,10 @@
+46 error Error: Command failed: git push --follow-tags --no-verify origin master
+46 error remote: error: GH006: Protected branch update failed for refs/heads/master.
+46 error remote: error: Required status check "ci/circleci: build-and-test" is expected.
+46 error To github.com:redgridone/plasmid.git
+46 error  * [new tag]         v0.0.2 -> v0.0.2
+46 error  ! [remote rejected] master -> master (protected branch hook declined)
+46 error error: failed to push some refs to 'git@github.com:redgridone/plasmid.git'
+46 error
+46 error     at makeError (/home/willem/repos/plasmid/node_modules/execa/index.js:174:9)
+46 error     at Promise.all.then.arr (/home/willem/repos/plasmid/node_modules/execa/index.js:278:16)
