@@ -36,7 +36,7 @@ module.exports.initNode = function (path) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options }) {
+module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),
@@ -59,7 +59,7 @@ module.exports.subscribe = function (node, feedKey, { sequence, timestamp, detai
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp }) {
+module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),
@@ -83,7 +83,7 @@ module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp }) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema }) {
+module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),
@@ -106,7 +106,7 @@ module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteCon
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise}
  */
-module.exports.revoke = function (node, feedKey, {sequence, timestamp }) {
+module.exports.revoke = function (node, feedKey, {sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),
@@ -130,7 +130,7 @@ module.exports.revoke = function (node, feedKey, {sequence, timestamp }) {
  * @param      {number}   [timestamp=<current-timestamp>]  The timestamp
  * @return     {Promise<Object>}  The entry that was actually authored
  */
-module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp }) {
+module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
       node.feedKey(),

@@ -24,11 +24,11 @@ test('Adds and removes swarms with subscribe/unsubscribe', async t => {
 
   t.is(Object.keys(r.foreignFeedSwarms).length, 0)
 
-  await subscribe(n, 0, testKey, {}, {})
+  await subscribe(n, testKey)
   await newSwarm
   t.is(Object.keys(r.foreignFeedSwarms).length, 1)
 
-  await unsubscribe(n, 1, testKey)
+  await unsubscribe(n, testKey)
   await removedSwarm
   t.is(Object.keys(r.foreignFeedSwarms).length, 0)
 })

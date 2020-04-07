@@ -157,7 +157,7 @@ module.exports = (app, node, replicator) => {
   app.post('/author/:type', async (req, res) => {
     const type = req.params.type
     const content = req.json
-    await authorEntry(node, node.feed.length, type, content)
+    await authorEntry(node, type, content)
     res.sendStatus(200)
   })
 
@@ -182,7 +182,7 @@ module.exports = (app, node, replicator) => {
    */
   app.post('/subscribe/:feed_key([0-91-f]{64})', async (req, res) => {
     const feedKey = req.params.feed_key
-    await subscribe(node, node.feed.length, feedKey, {}, {})
+    await subscribe(node, feedKey)
     res.sendStatus(200)
   })
 
@@ -207,7 +207,7 @@ module.exports = (app, node, replicator) => {
    */
   app.post('/unsubscribe/:feed_key([0-91-f]{64})', async (req, res) => {
     const feedKey = req.params.feed_key
-    await unsubscribe(node, node.feed.length, feedKey)
+    await unsubscribe(node, feedKey)
     res.sendStatus(200)
   })
 }
