@@ -7,10 +7,10 @@ test('A node can subscribe to another using replication streams', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
   // alice subscribes to bob
-  await subscribe(alice, 0, bob.feedKey(), {}, {}, 0)
+  await subscribe(alice, bob.feedKey(), { timestamp: 0 })
 
   // bob authors an entry to their feed
-  const bobEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
+  const bobEntry = await authorEntry(bob, 'HELLO', {}, { timestamp: 100 })
 
   // wait for alice to receive it
   const aliceEntry = await new Promise((resolve, reject) => {
@@ -25,8 +25,8 @@ test('A node can subscribe to another using replication streams', async t => {
 
 test('Can subscribe to a feed with an alias, details are passed to event', async t => {
   const [alice, bob] = await bootstrapNodes(2)
-  await subscribe(alice, 0, bob.feedKey(), { someField: 'passed-to-every-event' }, { alias: 'some-alias' }, 0)
-  const bobAuthoredEntry = await authorEntry(bob, 0, 'HELLO', {}, 100)
+  await subscribe(alice, bob.feedKey(), { details: { someField: 'passed-to-every-event' }, options: { alias: 'some-alias' }, timestamp: 0 })
+  const bobAuthoredEntry = await authorEntry(bob, 'HELLO', {}, { timestamp: 100 })
   const aliceReceivedEntry = await new Promise((resolve, reject) => {
     alice.on('newData:some-alias', (data, details) => {
       t.is(details.someField, 'passed-to-every-event')
@@ -39,11 +39,11 @@ test('Can subscribe to a feed with an alias, details are passed to event', async
 test('Subscribing different feeds to the same alias, only the later one gives events', async t => {
   const [alice, bob, carol] = await bootstrapNodes(3)
 
-  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' }, 0)
-  await subscribe(alice, 1, carol.feedKey(), { }, { alias: 'some-alias' }, 0)
+  await subscribe(alice, bob.feedKey(), { options: { alias: 'some-alias' }, timestamp: 0 })
+  await subscribe(alice, carol.feedKey(), { options: { alias: 'some-alias' }, timestamp: 0 })
 
-  await authorEntry(bob, 0, 'HELLO', { msg: 'hi from bob' }, 100)
-  await authorEntry(carol, 0, 'HELLO', { msg: 'hi from carol' }, 100)
+  await authorEntry(bob, 'HELLO', { msg: 'hi from bob' }, { timestamp: 100 })
+  await authorEntry(carol, 'HELLO', { msg: 'hi from carol' }, { timestamp: 100 })
 
   // should only receive alias event from Carol
   await new Promise((resolve, reject) => {
@@ -57,8 +57,8 @@ test('Subscribing different feeds to the same alias, only the later one gives ev
 test('Unsubscribing removes registered alias', async t => {
   const [alice, bob] = await bootstrapNodes(2)
 
-  await subscribe(alice, 0, bob.feedKey(), { }, { alias: 'some-alias' }, 0)
-  await unsubscribe(alice, 1, bob.feedKey(), 1)
+  await subscribe(alice, bob.feedKey(), { }, { alias: 'some-alias' }, { timestamp: 0 })
+  await unsubscribe(alice, bob.feedKey(), { timestamp: 1 })
 
   t.is(alice.feedAliases['some-alias'], undefined)
 })

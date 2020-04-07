@@ -49,7 +49,7 @@ const replicator = new Replicator(node)
 
 // subscribe to another node to copy their feed and register events when they publish new data
 const remoteFeedKey = '0000000000000000000000000000000000000000000000000000000000000000' 
-await subscribe(node, node.feed.length, {}, {})
+await subscribe(node, remoteFeedKey)
 node.on(`newData:${remoteFeedKey}`, data => {
   console.log('Our friend just added new data!', data)
 })

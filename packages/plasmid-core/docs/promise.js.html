@@ -73,18 +73,19 @@ module.exports.initNode = function (path) {
  * Wait for a node to author a subscribe message and initialize the foreign feed
  *
  * @param      {Node}   node           The node
- * @param      {number}   sequence       The sequence
  * @param      {string}   feedKey        The feed key
- * @param      {object}   details        The details
- * @param      {object}   options        The options
- * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
+ * @param      {object}   [details={}]       The details
+ * @param      {object}   [options={}]       The options
  * @return     {Promise}
  */
-module.exports.subscribe = function (node, sequence, feedKey, details, options, timestamp) {
+module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newSubscribeContent(feedKey, details, options)
     ))
@@ -98,16 +99,17 @@ module.exports.subscribe = function (node, sequence, feedKey, details, options, 
  * Wait for a node to author an unsubscribe message and destroy feed
  *
  * @param      {Node}   node       The node
- * @param      {number}   sequence   The sequence
  * @param      {string}   feedKey    The feed key
- * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
-module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
+module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newUnsubscribeContent(feedKey)
     ))
@@ -121,17 +123,18 @@ module.exports.unsubscribe = function (node, sequence, feedKey, timestamp) {
  * Wait for a node to author a grant entry
  *
  * @param      {Node}   node                      The node
- * @param      {number}   sequence                  The sequence
  * @param      {string}   feedKey                   The feed key
- * @param      {JsonSchema}   [remoteContentSchema={}]  The remote content schema
- * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
+ * @param      {JsonSchema}   [opts.remoteContentSchema={}]  The remote content schema
  * @return     {Promise}
  */
-module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = {}, timestamp) {
+module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newGrantContent(feedKey, remoteContentSchema)
     ))
@@ -144,17 +147,18 @@ module.exports.grant = function (node, sequence, feedKey, remoteContentSchema = 
 /**
  * Wait for a node to author a revoke entry
  *
- * @param      {Node}   node                      The node
- * @param      {number}   sequence                  The sequence
+ * @param      {Node}     node                      The node
  * @param      {string}   feedKey                   The feed key
- * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
-module.exports.revoke = function (node, sequence, feedKey, timestamp) {
+module.exports.revoke = function (node, feedKey, {sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       newRevokeContent(feedKey)
     ))
@@ -168,17 +172,18 @@ module.exports.revoke = function (node, sequence, feedKey, timestamp) {
  * Wait for a node to author an entry to its feed
  *
  * @param      {Node}   node           The node
- * @param      {number}   sequence       The sequence
  * @param      {string}   type           The type
  * @param      {object}   otherContent   The other content
- * @param      {number}   [timestamp=&lt;current-timestamp>]  The timestamp
+ * @param      {object}   [opts={}]  Optional parameters
+ * @param      {number}   opts.sequence    The sequence number of the entry that is created. Defaults to node.feed.length
+ * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise&lt;Object>}  The entry that was actually authored
  */
-module.exports.authorEntry = function (node, sequence, type, otherContent, timestamp) {
+module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp } = {}) {
   return new Promise((resolve, reject) => {
     node.createWriteStream().write(newEntry(
-      node.feed.key.toString('hex'),
-      sequence,
+      node.feedKey(),
+      getOrUseSequence(node, sequence),
       getOrUseTimestamp(timestamp),
       {
         type,
@@ -213,6 +218,14 @@ function getOrUseTimestamp (timestamp) {
     return new Date().getTime()
   }
 }
+
+function getOrUseSequence (node, sequence) {
+  if (typeof sequence === 'number') {
+    return sequence
+  } else {
+    return node.feed.length
+  }
+}
 </code></pre>
         </article>
     </section>
@@ -227,7 +240,7 @@ function getOrUseTimestamp (timestamp) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Tue Apr 07 2020 17:44:18 GMT+1000 (Australian Eastern Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Tue Apr 07 2020 18:50:30 GMT+1000 (Australian Eastern Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
