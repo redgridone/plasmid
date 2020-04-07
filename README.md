@@ -4,6 +4,34 @@ PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both 
 
 [Read the docs here](https://redgridone.github.io/plasmid/)
 
+## About this repo
+
+This monorepo uses [Lerna.js](https://lerna.js.org/) to manage multiple js packages and dependencies. 
+
+- `plasmid-core` is the base layer over Hypercore. This includes specifications of entry formats, entry validation and handling of system entries (subscribe/unsubscribe etc). It predominantly uses a stream interface and node events. It has no networking capabilities.
+- `plasmid-replicator` uses Hyperswarm to replicate a nodes feed and also the feeds it is subscribed to.
+- `plasmid-daemon` is a higher level executable that combines the above to create a running plasmid node which can be communicated with over HTTP. 
+
+To get up and running requires the following commands
+
+```bash
+npm install # installs lerna
+npm run bootstrap # installs other dependencies and links packages together
+```
+
+You can start a plasmid daemon that persists to a local dir and listens on port 3000 by running the following: 
+
+```bash
+lerna run start --stream --scope plasmid-daemon -- ./scratch/persist/ 3000
+```
+
+This hosts it own swagger docs at [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/)!
+
+Run tests over all modules by running from the project root
+```bash
+lerna run test
+```
+
 ## Overview
 
 Being based on Hypercore/Hyperswarm which are major components of the DAT protocol it shares much of its codebase. DAT adds a filesystem abstraction on top of single-author message feeds while Plasmid adds dynamic multi-feed PubSub style subscriptions and messaging based events.

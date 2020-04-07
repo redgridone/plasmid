@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "plasmid-core": "file:packages/plasmid-core",
-    "plasmid-replicator": "file:packages/plasmid-replicator"
+    "plasmid-replicator": "file:packages/plasmid-replicator",
+    "plasmid-daemon": "file:packages/plasmid-daemon"
   }
 }

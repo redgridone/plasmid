@@ -1,0 +1,20 @@
+{
+  "name": "plasmid-daemon",
+  "version": "0.0.1",
+  "description": "A daemon that runs a plasmid node and exposes an interface over http",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
+  "author": "Willem Olding <@wollum>",
+  "license": "MIT",
+  "dependencies": {
+    "ava": "^3.5.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "plasmid-core": "^0.0.1",
+    "plasmid-replicator": "^0.0.1",
+    "swagger-jsdoc": "^4.0.0",
+    "swagger-ui-express": "^4.1.4"
+  }
+}
