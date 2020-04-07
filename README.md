@@ -9,7 +9,7 @@ PubSub messaging protocol based on Hypercore/Hyperswarm. It is inspired by both 
 This monorepo uses [Lerna.js](https://lerna.js.org/) to manage multiple js packages and dependencies. 
 
 - `plasmid-core` is the base layer over Hypercore. This includes specifications of entry formats, entry validation and handling of system entries (subscribe/unsubscribe etc). It predominantly uses a stream interface and node events. It has no networking capabilities.
-- `plasmid-replicator` uses Hyperswarm to replicate a nodes feed and also the feeds it is subscribed to over a socket connection. 
+- `plasmid-replicator` uses Hyperswarm to replicate a nodes feed and also the feeds it is subscribed to.
 - `plasmid-daemon` is a higher level executable that combines the above to create a running plasmid node which can be communicated with over HTTP. 
 
 To get up and running requires the following commands

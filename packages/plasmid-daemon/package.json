@@ -4,7 +4,6 @@
   "description": "A daemon that runs a plasmid node and exposes an interface over http",
   "main": "src/index.js",
   "scripts": {
-    "test": "ava",
     "start": "node ./src/index.js"
   },
   "author": "Willem Olding <@wollum>",
