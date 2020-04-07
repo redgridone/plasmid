@@ -6,7 +6,7 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
-        "destination": "./docs/",
+        "destination": "../../docs/plasmid-replicator",
         "template": "../../node_modules/docdash",
         "recurse": true
     }
