@@ -1,7 +1,7 @@
 const { subscribe, unsubscribe, authorEntry } = require('plasmid-core').promise
 
 // takes an express app instance and a device and sets up this device daemons HTTP endpoints
-module.exports = (app, node) => {
+module.exports = (app, node, replicator) => {
   app.use(require('body-parser').text())
 
   /**
@@ -29,7 +29,8 @@ module.exports = (app, node) => {
     res.json({
       feedKey: node.feedKey(),
       subscriptions: Object.keys(node.foreignFeeds),
-      capabilities: node.capabilities
+      capabilities: node.capabilities,
+      peers: replicator.peers
     })
   })
 

@@ -22,12 +22,16 @@ class Replicator extends EventEmitter {
 
     this.deviceFeedSwarm
       .on('connection', (connection, info) => this._handleConnection(null, connection, info))
+    this.deviceFeedSwarm
+      .on('disconnection', (connection, info) => this._handleDisconnection(null, info))
     this.deviceFeedSwarm.join(feedKeyToTopic(node.feedKey()), { lookup: true, announce: true })
 
     node.on('subscribed', feedKey => {
       this.foreignFeedSwarms[feedKey] = hyperswarm(options)
       this.foreignFeedSwarms[feedKey]
         .on('connection', (connection, info) => this._handleConnection(feedKey, connection, info))
+      this.deviceFeedSwarm
+        .on('disconnection', (connection, info) => this._handleDisconnection(feedKey, info))
       this.foreignFeedSwarms[feedKey].join(feedKeyToTopic(feedKey), { lookup: true, announce: true })
       /**
        * New swarm created event
@@ -56,12 +60,33 @@ class Replicator extends EventEmitter {
   _handleConnection (feedKey, connection, info) {
     const stream = this.node.createReplicationStream(feedKey, info.client, { live: true })
     pump(connection, stream, connection)
+    if (info.peer) {
+      const { topic, ...peer } = info.peer
+      this.peers[feedKey || 'self'] = [peer, ...(this.peers[feedKey || 'self'] || [])]
+    }
     /**
-     * New connection event
+     * Connect to peer event
      * @event Replicator#connection
      * @type object
      */
     this.emit('connection', info)
+  }
+
+  _handleDisconnection (feedKey, info) {
+    if (info.peer) {
+      const { topic, ...peer } = info.peer
+      // remove peer entries identical to this one.
+      // This may not be perfect...
+      this.peers[feedKey || 'self'] = (this.peers[feedKey || 'self'] || []).filter(p => {
+        return JSON.stringify(p) !== JSON.stringify(peer)
+      })
+    }
+    /**
+     * Disconnect from peer event
+     * @event Replicator#disconnection
+     * @type object
+     */
+    this.emit('disconnection', info)
   }
 }
 
