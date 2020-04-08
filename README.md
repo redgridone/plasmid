@@ -35,23 +35,30 @@ lerna run test
 ## Examples running a plasmid node
 
 ```javascript
-const { Node } = require('plasmid-core')
 const { initNode, subscribe } = require('plasmid-core').promise
 const Replicator = require('plasmid-replicator')
 
-// Create a new node that persists to './store'
-// This will create new keys the first time and reboot on subsequent runs
-const node = await initNode('./store')
+async function main() {
+    // Create a new node that persists to './store'
+    // This will create new keys the first time and reboot on subsequent runs
+    const node = await initNode('./store')
+    
+    // Create a replicator. This handles the discovery of peers and syncing data.
+    // This also emits events (such as when a new peer joins)
+    const replicator = new Replicator(node)
+    
+    // subscribe to another node to copy their feed and register events when they publish new data
+    const remoteFeedKey = '0000000000000000000000000000000000000000000000000000000000000000' 
+    await subscribe(node, remoteFeedKey)
+    node.on(`newData:${remoteFeedKey}`, data => {
+      console.log('Our friend just added new data!', data)
+    })
+}
 
-// Create a replicator. This handles the discovery of peers and syncing data.
-// This also emits events (such as when a new peer joins)
-const replicator = new Replicator(node)
-
-// subscribe to another node to copy their feed and register events when they publish new data
-const remoteFeedKey = '0000000000000000000000000000000000000000000000000000000000000000' 
-await subscribe(node, remoteFeedKey)
-node.on(`newData:${remoteFeedKey}`, data => {
-  console.log('Our friend just added new data!', data)
+(async () => {
+  await main()
+})().catch(e => {
+  console.error(e)
 })
 ```
 
