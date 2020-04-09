@@ -59,6 +59,11 @@ class Node extends EventEmitter {
     this.readStream = this.feed.createReadStream({ live: true, snapshot: false })
     this.readStream
       .on('data', data => {
+        /**
+         * Emitted every time this node authors an entry to its feed
+         * @event Node#authoredEntry
+         */
+        this.emit('authoredEntry', data)
         switch (data.content.type) {
           case SYS_ENTRIES.SUBSCRIBE:
             this._subscribe(data)
@@ -75,11 +80,6 @@ class Node extends EventEmitter {
           default:
             // a non-system entry was authored
         }
-        /**
-         * Emitted every time this node authors an entry to its feed
-         * @event Node#authoredEntry
-         */
-        this.emit('authoredEntry', data)
       })
   }
 
