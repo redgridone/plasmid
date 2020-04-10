@@ -1,6 +1,6 @@
 const test = require('ava')
 
-const { subscribe, unsubscribe, authorEntry } = require('../../lib').promise
+const { initNode, subscribe, unsubscribe, authorEntry } = require('../../lib').promise
 const { bootstrapNodes } = require('./multi-node-bootstrapper')
 
 test('A node can subscribe to another using replication streams', async t => {
@@ -61,4 +61,13 @@ test('Unsubscribing removes registered alias', async t => {
   await unsubscribe(alice, bob.feedKey(), { timestamp: 1 })
 
   t.is(alice.feedAliases['some-alias'], undefined)
+})
+
+test('A node subscribing can be closed and reinitialized', async t => {
+  const [alice, bob] = await bootstrapNodes(2)
+  const alicePath = alice.storagePath
+  await subscribe(alice, bob.feedKey(), { timestamp: 0 })
+  alice.close()
+  const aliceReborn = await initNode(alicePath)
+  t.is(aliceReborn.foreignFeeds[bob.feedKey])
 })
