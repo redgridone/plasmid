@@ -3,6 +3,8 @@ const { newScratchDir } = require('./test-utils')
 const { initNode, subscribe, unsubscribe, head } = require('../lib').promise
 
 const testKey = '0'.repeat(64)
+const testKey2 = '1'.repeat(64)
+
 const expectedSubscribeContent = {
   type: '%subscribe',
   feedKey: testKey,
@@ -45,4 +47,14 @@ test('Can subscribe, unsubscribe, resubsubscribe many times...', async t => {
     t.is(n.foreignFeeds[testKey], undefined)
   }
   t.is(n.feed.length, 2 * nIter)
+})
+
+test('Can subscribe to multiple feeds', async t => {
+  const n = await initNode(newScratchDir())
+  await subscribe(n, testKey, { timestamp: 0 })
+  t.is(n.feed.length, 1)
+  await subscribe(n, testKey2, { timestamp: 0 })
+  t.is(n.feed.length, 2)
+  t.assert(n.foreignFeeds[testKey])
+  t.assert(n.foreignFeeds[testKey2])
 })

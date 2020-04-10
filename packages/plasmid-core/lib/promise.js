@@ -4,7 +4,7 @@
  */
 
 const Node = require('./node')
-const { newEntry, newSubscribeContent, newUnsubscribeContent, newGrantContent, newRevokeContent } = require('./entries')
+const { newEntry, newSubscribeContent, newUnsubscribeContent, newGrantContent, newRevokeContent, SYS_ENTRIES } = require('./entries')
 
 /**
  * Initialize a new node and wait for it to be ready
@@ -37,18 +37,14 @@ module.exports.initNode = function (path) {
  * @param      {object}   [options={}]       The options
  * @return     {Promise}
  */
-module.exports.subscribe = function (node, feedKey, { sequence, timestamp, details, options } = {}) {
-  return new Promise((resolve, reject) => {
-    node.createWriteStream().write(newEntry(
-      node.feedKey(),
-      getOrUseSequence(node, sequence),
-      getOrUseTimestamp(timestamp),
-      newSubscribeContent(feedKey, details, options)
-    ))
+module.exports.subscribe = async function (node, feedKey, { sequence, timestamp, details, options } = {}) {
+  const sub = new Promise((resolve, reject) => {
     node.on(`subscribed:${feedKey}`, () => {
       resolve()
     })
   })
+  await authorEntry(node, SYS_ENTRIES.SUBSCRIBE, newSubscribeContent(feedKey, details, options), { sequence, timestamp })
+  await sub
 }
 
 /**
@@ -61,18 +57,14 @@ module.exports.subscribe = function (node, feedKey, { sequence, timestamp, detai
  * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
-module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = {}) {
-  return new Promise((resolve, reject) => {
-    node.createWriteStream().write(newEntry(
-      node.feedKey(),
-      getOrUseSequence(node, sequence),
-      getOrUseTimestamp(timestamp),
-      newUnsubscribeContent(feedKey)
-    ))
+module.exports.unsubscribe = async function (node, feedKey, { sequence, timestamp } = {}) {
+  const unsub = new Promise((resolve, reject) => {
     node.on(`unsubscribed:${feedKey}`, () => {
       resolve()
     })
   })
+  await authorEntry(node, SYS_ENTRIES.UNSUBSCRIBE, newUnsubscribeContent(feedKey), { sequence, timestamp })
+  await unsub
 }
 
 /**
@@ -86,18 +78,14 @@ module.exports.unsubscribe = function (node, feedKey, { sequence, timestamp } = 
  * @param      {JsonSchema}   [opts.remoteContentSchema={}]  The remote content schema
  * @return     {Promise}
  */
-module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteContentSchema } = {}) {
-  return new Promise((resolve, reject) => {
-    node.createWriteStream().write(newEntry(
-      node.feedKey(),
-      getOrUseSequence(node, sequence),
-      getOrUseTimestamp(timestamp),
-      newGrantContent(feedKey, remoteContentSchema)
-    ))
+module.exports.grant = async function (node, feedKey, { sequence, timestamp, remoteContentSchema } = {}) {
+  const grant = new Promise((resolve, reject) => {
     node.on(`grant:${feedKey}`, () => {
       resolve()
     })
   })
+  await authorEntry(node, SYS_ENTRIES.GRANT, newGrantContent(feedKey, remoteContentSchema), { sequence, timestamp })
+  await grant
 }
 
 /**
@@ -110,18 +98,14 @@ module.exports.grant = function (node, feedKey, { sequence, timestamp, remoteCon
  * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise}
  */
-module.exports.revoke = function (node, feedKey, { sequence, timestamp } = {}) {
-  return new Promise((resolve, reject) => {
-    node.createWriteStream().write(newEntry(
-      node.feedKey(),
-      getOrUseSequence(node, sequence),
-      getOrUseTimestamp(timestamp),
-      newRevokeContent(feedKey)
-    ))
+module.exports.revoke = async function (node, feedKey, { sequence, timestamp } = {}) {
+  const revoke = new Promise((resolve, reject) => {
     node.on(`revoke:${feedKey}`, () => {
       resolve()
     })
   })
+  await authorEntry(node, SYS_ENTRIES.REVOKE, newRevokeContent(feedKey), { sequence, timestamp })
+  await revoke
 }
 
 /**
@@ -135,19 +119,24 @@ module.exports.revoke = function (node, feedKey, { sequence, timestamp } = {}) {
  * @param      {number}   opts.timestamp  Timestamp of created entry. Defaults to current timestamp
  * @return     {Promise<Object>}  The entry that was actually authored
  */
-module.exports.authorEntry = function (node, type, otherContent, { sequence, timestamp } = {}) {
+module.exports.authorEntry = authorEntry
+
+function authorEntry (node, type, otherContent, { sequence, timestamp } = {}) {
+  const entry = newEntry(
+    node.feedKey(),
+    getOrUseSequence(node, sequence),
+    getOrUseTimestamp(timestamp),
+    {
+      type,
+      ...otherContent
+    }
+  )
   return new Promise((resolve, reject) => {
-    node.createWriteStream().write(newEntry(
-      node.feedKey(),
-      getOrUseSequence(node, sequence),
-      getOrUseTimestamp(timestamp),
-      {
-        type,
-        ...otherContent
+    node.createWriteStream().write(entry)
+    node.on('authoredEntry', authoredEntry => {
+      if (JSON.stringify(authoredEntry) === JSON.stringify(entry)) {
+        resolve(entry)
       }
-    ))
-    node.on('authoredEntry', entry => {
-      resolve(entry)
     })
   })
 }

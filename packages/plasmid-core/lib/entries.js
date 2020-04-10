@@ -46,9 +46,9 @@ function newEntry (author, sequence, timestamp, content = {}, remoteAuthor = und
     author,
     sequence,
     timestamp,
-    content,
-    remoteAuthor
+    content
   }
+  if (remoteAuthor) entry.remoteAuthor = remoteAuthor
   validateEntry(entry) // throws an error if entry not valid
   return entry
 }
