@@ -84,9 +84,15 @@ class Node extends EventEmitter {
   }
 
   /**
-   * Close this node including its feeds and streams
+   * Close this node including its feeds and streams and those it follows
    */
   close () {
+    Object.values(this.feedReadStreams).forEach(readStream => {
+      readStream.destroy()
+    })
+    Object.values(this.foreignFeeds).forEach(feed => {
+      feed.close()
+    })
     this.readStream.destroy()
     this.feed.close()
   }
