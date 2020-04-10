@@ -19,17 +19,10 @@ const swaggerDocOpts = {
   apis: ['./src/http-interface.js']
 }
 
+const port = 8080
+const persistencePath = '/var/lib/plasmid-store'
+
 async function main () {
-  if (!process.argv[2]) {
-    console.error('No persistence storage path provided (first arg)')
-    process.exit(1)
-  }
-  const persistencePath = process.cwd() + '/' + process.argv[2]
-  if (!process.argv[3]) {
-    console.error('No port provided (second arg)')
-    process.exit(1)
-  }
-  const port = process.argv[3]
   console.log('Setting up node persistence dir...', persistencePath)
   if (!fs.existsSync(persistencePath)) {
     fs.mkdirSync(persistencePath, { recursive: true })
