@@ -151,12 +151,22 @@ class Node extends EventEmitter {
   /* ----------  Internal methods  ---------- */
 
   _subscribe ({ timestamp, content: { feedKey, details, options } }) {
+    if (this.foreignFeeds[feedKey] !== undefined) { // don't subscribe more than once
+      // still trigger the signals though
+      console.log('Already subscribed! not adding again')
+      this.emit('subscribed', feedKey)
+      this.emit(`subscribed:${feedKey}`, details, options)
+      if (options && options.alias && typeof options.alias === 'string') {
+        this.emit(`subscribed:${options.alias}`, details, options)
+      }
+      return
+    }
     const feed = hypercore(`${this.storagePath}/${feedKey}`, feedKey, {
       valueEncoding: 'json',
       sparse: true
     })
+    this.foreignFeeds[feedKey] = feed
     feed.on('ready', () => {
-      this.foreignFeeds[feedKey] = feed
       /**
        * Emitted every time the node subscribes to a new feed
        * @event Node#subscribed
