@@ -24,7 +24,7 @@ async function main () {
     console.error('No persistence storage path provided (first arg)')
     process.exit(1)
   }
-  const persistencePath = process.cwd() + '/' + process.argv[2]
+  const persistencePath = process.argv[2]
   if (!process.argv[3]) {
     console.error('No port provided (second arg)')
     process.exit(1)
