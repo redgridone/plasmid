@@ -1,6 +1,6 @@
 {
   "name": "plasmid-core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A distributed pubsub messaging protocol built on Hypercore",
   "main": "lib/index.js",
   "scripts": {

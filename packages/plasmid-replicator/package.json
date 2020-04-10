@@ -1,6 +1,6 @@
 {
   "name": "plasmid-replicator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A wrapper that maintains hyperswarm instances to replicate feeds in plasmid",
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "hyperswarm": "^2.10.1"
   },
   "devDependencies": {
-    "plasmid-core": "^0.0.4"
+    "plasmid-core": "^0.0.5"
   },
   "ava": {
     "files": [
