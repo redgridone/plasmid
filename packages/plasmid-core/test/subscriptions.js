@@ -39,7 +39,7 @@ test('Can subscribe then unsubscribe', async t => {
 
 test('Can subscribe, unsubscribe, resubsubscribe many times...', async t => {
   const n = await initNode(newScratchDir())
-  const nIter = 10
+  const nIter = 5
   for (let i = 0; i < nIter; i++) {
     await subscribe(n, testKey, { timestamp: 0 })
     t.truthy(n.foreignFeeds[testKey])
@@ -57,4 +57,13 @@ test('Can subscribe to multiple feeds', async t => {
   t.is(n.feed.length, 2)
   t.assert(n.foreignFeeds[testKey])
   t.assert(n.foreignFeeds[testKey2])
+})
+
+test('Can subscribe to the same feed multiple times', async t => {
+  const n = await initNode(newScratchDir())
+  await subscribe(n, testKey, { timestamp: 0 })
+  t.is(n.feed.length, 1)
+  await subscribe(n, testKey, { timestamp: 0 })
+  t.is(n.feed.length, 2)
+  t.assert(n.foreignFeeds[testKey])
 })
