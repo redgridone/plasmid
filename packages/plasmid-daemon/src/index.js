@@ -25,11 +25,11 @@ async function main () {
     process.exit(1)
   }
   const persistencePath = process.argv[2]
-  if (!process.argv[3]) {
-    console.error('No port provided (second arg)')
+  if (process.argv[3] === undefined && process.env.PLASMID_HTTP_PORT === undefined) {
+    console.error('No port provided (second arg) or PLASMID_HTTP_PORT env var')
     process.exit(1)
   }
-  const port = process.argv[3]
+  const port = process.argv[3] || process.env.PLASMID_HTTP_PORT
   console.log('Setting up node persistence dir...', persistencePath)
   if (!fs.existsSync(persistencePath)) {
     fs.mkdirSync(persistencePath, { recursive: true })

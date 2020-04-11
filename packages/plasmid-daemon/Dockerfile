@@ -13,6 +13,4 @@ RUN npm install
 # # Bundle app source
 COPY . .
 
-EXPOSE 8080
-
-CMD [ "node", "src/index.js", "/var/lib/plasmid-store/", "8080" ]
+CMD [ "node", "src/index.js", "/var/lib/plasmid-store/"]
