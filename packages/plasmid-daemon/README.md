@@ -15,10 +15,12 @@ This will take a while the first time but be very quick after that.
 Run the image using:
 
 ```
-docker run -p 49160:8080 -d <your username>/plasmid-daemon
+docker run --network host \
+    -e PLASMID_HTTP_PORT=3000 \
+    -d <your username>/plasmid-daemon
 ```
 
-To bind it to port `49160`. Chose another port it desired.
+To bind it to port `3000`. Chose another port it desired.
 
 Note this will only use temporary storage. 
 
@@ -33,5 +35,8 @@ docker volume create plasmid-data
 You can then mount this to where plasmid-daemon defaults to storing the data
 
 ```bash
-docker run -p 49160:8080 -v plasmid-data:/var/lib/plasmid-store -d <your username>/plasmid-daemon
+docker run --network host \
+    -e PLASMID_HTTP_PORT=3000 \
+    -v plasmid-data:/var/lib/plasmid-store \
+    -d <your username>/plasmid-daemon
 ```
