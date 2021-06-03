@@ -15,11 +15,11 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "jsdoc": "^3.6.3",
-    "lerna": "^3.20.2"
+    "lerna": "^3.22.1"
   },
   "dependencies": {
     "plasmid-core": "file:packages/plasmid-core",
-    "plasmid-replicator": "file:packages/plasmid-replicator",
-    "plasmid-daemon": "file:packages/plasmid-daemon"
+    "plasmid-daemon": "file:packages/plasmid-daemon",
+    "plasmid-replicator": "file:packages/plasmid-replicator"
   }
 }
